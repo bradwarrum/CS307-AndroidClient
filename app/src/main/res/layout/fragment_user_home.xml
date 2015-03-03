@@ -13,7 +13,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            <TextView android:text="@string/user_home_title" android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/user_home_text_field"
+                android:text="@string/user_home_title" android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="30sp"/>
             <Button

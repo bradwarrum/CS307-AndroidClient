@@ -5,6 +5,10 @@ import android.util.Log;
 import com.example.android.virtualpantry.Data.JSONModels;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -18,6 +22,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 
 /**
@@ -29,6 +34,7 @@ public class ConnectionManager {
     private static final int port = 8000;
     private static final String host = "104.236.87.206";
     private static String response = null;
+    private static String token = null;
 
     public static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -143,15 +149,37 @@ public class ConnectionManager {
         request.setPostMethod();
         String reqstr = gson.toJson(new JSONModels.LoginReqJSON(emailAddress, password));
         request.send(reqstr);
-        System.out.println("Response:");
         rcode = request.getResponseCode();
-        System.out.println("HTTP " + rcode);
         try {
             response = request.getResponse();
+            JSONObject json = new JSONObject(response);
+            token = json.getString("token");
         }catch (IOException e) {
             Log.e("Login", "Get Response from request failed", e);
+        } catch (JSONException e){
+            Log.e("Login", "Failed to parse login response", e);
         }
         request.close();
         return rcode;
+    }
+
+    public static JSONModels.UserInfoResJSON getUserInfo() throws IOException {
+
+        int rcode;
+        String url;
+        JSONModels.UserInfoResJSON userInfo = null;
+        Transaction request = new Transaction(protocol, host, port, "/users/me?token=" + token);
+        request.setGetMethod();
+        url = request.getRequestURL();
+        Log.v("getUserInfo", url);
+        rcode = request.getResponseCode();
+        try {
+            response = request.getResponse();
+            userInfo = gson.fromJson(response, JSONModels.UserInfoResJSON.class);
+        } catch (IOException e) {
+            Log.e("getUserInfo", "Unknown", e);
+        }
+        request.close();
+        return userInfo;
     }
 }

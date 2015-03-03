@@ -2,16 +2,28 @@ package com.example.android.virtualpantry;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.example.android.virtualpantry.Data.JSONModels;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.IOException;
 
 
 public class UserHomeActivity extends Activity {
+
+    private static final String LOG_TAG = "UserHomeActivity";
+    private JSONModels.UserInfoResJSON userInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +34,9 @@ public class UserHomeActivity extends Activity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+        GetUserInfoTask getInfoTask = new GetUserInfoTask();
+        getInfoTask.execute((Void) null);
+
     }
 
 
@@ -65,6 +80,36 @@ public class UserHomeActivity extends Activity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_user_home, container, false);
             return rootView;
+        }
+    }
+
+    public class GetUserInfoTask extends AsyncTask<Void, Void, Boolean> {
+
+        private static final String LOG_TAG = "GetUserInfoTask";
+        private JSONModels.UserInfoResJSON userInfo = null;
+
+        public GetUserInfoTask() {
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try{
+                userInfo = ConnectionManager.getUserInfo();
+            } catch (IOException e){
+                Log.e(LOG_TAG, "Failed to get user info", e);
+                return false;
+            }
+            return true;
+
+        }
+
+        @Override
+        protected void onPostExecute(Boolean sucess) {
+            UserHomeActivity.this.userInfo = userInfo;
+            TextView userHomeMessage = (TextView) findViewById(R.id.user_home_text_field);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Log.v(LOG_TAG, "succefully loaded userinfo");
+            userHomeMessage.setText(gson.toJson(userInfo));
         }
     }
 }
