@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="user_home_title">Welcome to the user home page.</string>
+    <string name="user_home_household_button">Households</string>
+    <string name="user_home_shopping_list_button">Shopping Lists</string>
+    <string name="user_home_inventory_button">Inventory</string>
+
+</resources>

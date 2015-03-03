@@ -1,24 +1,29 @@
 package com.example.android.virtualpantry;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
-public class UserHomeActivity extends Activity {
+public class Household_List_Activity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_home);
+        setContentView(R.layout.activity_household__list_);
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
@@ -28,7 +33,7 @@ public class UserHomeActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_user_home, menu);
+        getMenuInflater().inflate(R.menu.menu_household__list_, menu);
         return true;
     }
 
@@ -47,15 +52,12 @@ public class UserHomeActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void goToHouseholdsListScreen(View view){
-        Intent intent = new Intent(this, Household_List_Activity.class);
-        startActivity(intent);
-    }
-
     /**
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
+
+        private ArrayAdapter<String> mHouseholdAdapater;
 
         public PlaceholderFragment() {
         }
@@ -63,7 +65,22 @@ public class UserHomeActivity extends Activity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_user_home, container, false);
+            String[] data = {
+                    "Household 1",
+                    "Household 2",
+                    "Household 3"
+            };
+            List<String> households = new ArrayList<String>(Arrays.asList(data));
+            mHouseholdAdapater = new ArrayAdapter<String>(
+                    getActivity(),
+                    R.layout.list_item_household,
+                    R.id.list_item_household_textview,
+                    households);
+
+            View rootView = inflater.inflate(R.layout.fragment_household_list, container, false);
+
+            ListView listView = (ListView) rootView.findViewById(R.id.listview_households);
+            listView.setAdapter(mHouseholdAdapater);
             return rootView;
         }
     }

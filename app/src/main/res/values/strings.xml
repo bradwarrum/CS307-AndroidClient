@@ -3,4 +3,5 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_user_home">UserHomeActivity</string>
+    <string name="title_activity_household__list_">Household_List_Activity</string>
 </resources>

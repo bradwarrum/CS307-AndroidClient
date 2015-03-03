@@ -6,7 +6,30 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.example.android.virtualpantry.UserHomeActivity$PlaceholderFragment">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView android:text="@string/user_home_title" android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"/>
+            <Button
+                android:text="@string/user_home_household_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="goToHouseholdsListScreen"
+                />
+            <Button
+                android:text="@string/user_home_shopping_list_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <Button
+                android:text="@string/user_home_inventory_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>
