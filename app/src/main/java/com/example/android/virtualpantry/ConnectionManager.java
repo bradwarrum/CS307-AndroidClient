@@ -38,6 +38,9 @@ public class ConnectionManager {
     public static final int OK = 200;
     public static final int CREATED = 201;
 
+    //store data
+
+
     //Transaction class
     public static class Transaction {
         private HttpURLConnection connection;
