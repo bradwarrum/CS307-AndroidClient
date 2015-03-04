@@ -46,12 +46,20 @@
             android:label="@string/title_activity_user_home" >
         </activity>
         <activity
-            android:name=".Household_List_Activity"
+            android:name=".HouseholdListActivity"
             android:label="@string/title_activity_household__list_"
             android:parentActivityName=".UserHomeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.virtualpantry.UserHomeActivity" />
+        </activity>
+        <activity
+            android:name=".CreateHouseholdActivity"
+            android:label="@string/title_activity_create_household"
+            android:parentActivityName=".HouseholdListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HouseholdListActivity" />
         </activity>
     </application>
 

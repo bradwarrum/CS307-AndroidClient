@@ -1,9 +1,9 @@
 package com.example.android.virtualpantry;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,25 +11,43 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.example.android.virtualpantry.Data.JSONModels;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 
-public class Household_List_Activity extends Activity {
+public class HouseholdListActivity extends Activity {
+
+    JSONModels.UserInfoResJSON userInfo = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_household__list_);
+        setContentView(R.layout.activity_household_list_);
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+        Intent callerIntent = getIntent();
+        userInfo = (JSONModels.UserInfoResJSON) callerIntent.getParcelableExtra("userInfo");
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        TextView message = (TextView) findViewById(R.id.household_list_message);
+        message.setText("Some Text");
+        message.setText(gson.toJson(userInfo));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

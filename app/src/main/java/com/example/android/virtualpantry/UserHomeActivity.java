@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.android.virtualpantry.Data.JSONModels;
 import com.google.gson.Gson;
@@ -63,7 +62,8 @@ public class UserHomeActivity extends Activity {
     }
 
     public void goToHouseholdsListScreen(View view){
-        Intent intent = new Intent(this, Household_List_Activity.class);
+        Intent intent = new Intent(this, HouseholdListActivity.class);
+        intent.putExtra("userInfo", userInfo);
         startActivity(intent);
     }
 
@@ -106,10 +106,10 @@ public class UserHomeActivity extends Activity {
         @Override
         protected void onPostExecute(Boolean sucess) {
             UserHomeActivity.this.userInfo = userInfo;
-            TextView userHomeMessage = (TextView) findViewById(R.id.user_home_text_field);
+           // TextView userHomeMessage = (TextView) findViewById(R.id.user_home_text_field);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            Log.v(LOG_TAG, "succefully loaded userinfo");
-            userHomeMessage.setText(gson.toJson(userInfo));
+            Log.v(LOG_TAG, "succefully loaded userInfo:\n" + gson.toJson(userInfo));
+            //userHomeMessage.setText(gson.toJson(userInfo));
         }
     }
 }

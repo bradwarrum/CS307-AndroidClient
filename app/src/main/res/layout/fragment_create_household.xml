@@ -1,0 +1,37 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.example.android.virtualpantry.CreateHouseholdActivity$PlaceholderFragment"
+    android:orientation="vertical">
+
+    <TextView android:text="@string/Create_household_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:layout_marginBottom="20sp"/>
+    <AutoCompleteTextView
+        android:id="@+id/createHouseholdName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/Create_household_name_hint"
+        android:inputType="textAutoComplete"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:layout_marginBottom="10sp"/>
+    <AutoCompleteTextView
+        android:id="@+id/createHouseholdDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/Create_household_description_hint"
+        android:inputType="textAutoComplete"
+        android:maxLines="10"
+        android:layout_marginBottom="10sp"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/Create_household_button_text"/>
+
+</LinearLayout>

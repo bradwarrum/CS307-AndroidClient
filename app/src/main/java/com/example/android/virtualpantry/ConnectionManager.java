@@ -182,4 +182,18 @@ public class ConnectionManager {
         request.close();
         return userInfo;
     }
+
+    public int createHousehold(String name, String description) throws IOException {
+        int rcode;
+        Transaction request = new Transaction(protocol, host, port, "/households/create?token=" + token);
+        request.setPostMethod();
+        String reqstr = gson.toJson(new JSONModels.HouseholdCreateReqJSON(name, description));
+        request.send(reqstr);
+        rcode = request.getResponseCode();
+        try {
+            response = request.getResponse();
+        }catch (IOException e) {}
+        request.close();
+        return rcode;
+    }
 }

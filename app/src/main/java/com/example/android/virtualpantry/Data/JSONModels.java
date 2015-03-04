@@ -125,4 +125,13 @@ public class JSONModels {
             householdDescription = in.readString();
         }
     }
+
+    public static class HouseholdCreateReqJSON {
+        private final String householdName;
+        private final String householdDescription;
+        public HouseholdCreateReqJSON(String name, String description ) {
+            householdName = name;
+            householdDescription = description;
+        }
+    }
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Create_household_title">Create a new household</string>
+    <string name="Create_household_name_hint">Household Name</string>
+    <string name="Create_household_description_hint">Household Description</string>
+    <string name="Create_household_button_text">Create Household</string>
+    <string name="Create_household_button_text_list">Create new household</string>
+</resources>
