@@ -5,7 +5,6 @@ import android.util.Log;
 import com.example.android.virtualpantry.Data.JSONModels;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,7 +21,6 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 
 /**
@@ -159,8 +157,9 @@ public class ConnectionManager {
             Log.e("Login", "Get Response from request failed", e);
         } catch (JSONException e){
             Log.e("Login", "Failed to parse login response", e);
+        } finally {
+            request.close();
         }
-        request.close();
         return rcode;
     }
 
@@ -179,8 +178,9 @@ public class ConnectionManager {
             userInfo = gson.fromJson(response, JSONModels.UserInfoResJSON.class);
         } catch (IOException e) {
             Log.e("getUserInfo", "Unknown", e);
+        } finally {
+            request.close();
         }
-        request.close();
         return userInfo;
     }
 
@@ -194,8 +194,22 @@ public class ConnectionManager {
         try {
             response = request.getResponse();
             lastResponseSaved = response;
-        }catch (IOException e) {}
-        request.close();
+        }catch (IOException e) {
+            Log.e("createHousehold", "Unkwnon", e);
+        }
+        finally {
+            request.close();
+        }
         return rcode;
+    }
+
+    public void link(long householdID, String UPC, String description, String unitName)throws IOException {
+        int rcode;
+        Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/link?token=" + token);
+        request.setPostMethod();
+        String reqstr = gson.toJson(new JSONModels.LinkReqJSON(description, unitName));
+        request.send(reqstr);
+        rcode = request.getResponseCode();
+        request.close();
     }
 }
