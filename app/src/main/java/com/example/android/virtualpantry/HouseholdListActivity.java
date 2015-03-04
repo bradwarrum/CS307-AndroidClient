@@ -13,12 +13,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.android.virtualpantry.Data.Household;
 import com.example.android.virtualpantry.Data.JSONModels;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.example.android.virtualpantry.Data.UserInfo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -32,7 +31,7 @@ public class HouseholdListActivity extends Activity {
         setContentView(R.layout.activity_household_list_);
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, new HouseholdListFragment())
                     .commit();
         }
         Intent callerIntent = getIntent();
@@ -43,10 +42,8 @@ public class HouseholdListActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         TextView message = (TextView) findViewById(R.id.household_list_message);
-        message.setText("Some Text");
-        message.setText(gson.toJson(userInfo));
+        message.setText("You have: " + UserInfo.getUserInfo().getHouseholds().size() + " active households");
     }
 
     @Override
@@ -71,36 +68,61 @@ public class HouseholdListActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void goToCreateHousehold(View view){
+        Intent intent = new Intent(this, CreateHouseholdActivity.class);
+        startActivity(intent);
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class HouseholdListFragment extends Fragment {
 
         private ArrayAdapter<String> mHouseholdAdapater;
+        private ListView mHouseholdList;
 
-        public PlaceholderFragment() {
+        public HouseholdListFragment() {
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            String[] data = {
-                    "Household 1",
-                    "Household 2",
-                    "Household 3"
-            };
-            List<String> households = new ArrayList<String>(Arrays.asList(data));
+            List<String> householdNames = new ArrayList<String>();
+            List<String> householdDescriptions = new ArrayList<String>();
+            for(Household household : UserInfo.getUserInfo().getHouseholds()){
+                householdNames.add(household.getHouseholdName());
+                householdDescriptions.add(household.getHouseholdDescription());
+            }
+            //TODO: subtitle, most likely needs a full refactor
             mHouseholdAdapater = new ArrayAdapter<String>(
                     getActivity(),
                     R.layout.list_item_household,
                     R.id.list_item_household_textview,
-                    households);
+                    householdNames);
 
             View rootView = inflater.inflate(R.layout.fragment_household_list, container, false);
 
-            ListView listView = (ListView) rootView.findViewById(R.id.listview_households);
-            listView.setAdapter(mHouseholdAdapater);
+            mHouseholdList = (ListView) rootView.findViewById(R.id.listview_households);
+            mHouseholdList.setAdapter(mHouseholdAdapater);
             return rootView;
+        }
+
+        @Override
+        public void onResume(){
+            super.onResume();
+            List<String> householdNames = new ArrayList<String>();
+            List<String> householdDescriptions = new ArrayList<String>();
+            for(Household household : UserInfo.getUserInfo().getHouseholds()){
+                householdNames.add(household.getHouseholdName());
+                householdDescriptions.add(household.getHouseholdDescription());
+            }
+            //TODO: subtitle, most likely needs a full refactor
+            mHouseholdAdapater = new ArrayAdapter<String>(
+                    getActivity(),
+                    R.layout.list_item_household,
+                    R.id.list_item_household_textview,
+                    householdNames);
+            mHouseholdList.setAdapter(mHouseholdAdapater);
         }
     }
 }

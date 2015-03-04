@@ -6,7 +6,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.example.android.virtualpantry.HouseholdListActivity$PlaceholderFragment"
+    tools:context="com.example.android.virtualpantry.HouseholdListActivity.HouseholdListFragment"
     android:orientation="vertical">
     <TextView
         android:id="@+id/household_list_message"
@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/Create_household_button_text_list"
-        android:onClick="goToHouseholdCreateScreen"/>
+        android:onClick="goToCreateHousehold"/>
    <ListView
        android:id="@+id/listview_households"
        android:layout_width="match_parent"

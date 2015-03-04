@@ -1,41 +1,36 @@
-package com.example.android.virtualpantry;
+package com.example.android.virtualpantry.Data;
 
-import android.app.Activity;
-import android.content.Intent;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.Build;
 
-import com.example.android.virtualpantry.Data.UserInfo;
+import com.example.android.virtualpantry.R;
 
-
-public class UserHomeActivity extends Activity {
-
-    private static final String LOG_TAG = "UserHomeActivity";
+public class HouseholdActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_home);
+        setContentView(R.layout.activity_household);
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new UserHomeActivityContentFragment())
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
-        GetUserInfoTask getInfoTask = new GetUserInfoTask(this);
-        getInfoTask.execute((Void) null);
-
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_user_home, menu);
+        getMenuInflater().inflate(R.menu.menu_household, menu);
         return true;
     }
 
@@ -54,25 +49,19 @@ public class UserHomeActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void goToHouseholdsListScreen(View view){
-        Intent intent = new Intent(this, HouseholdListActivity.class);
-        startActivity(intent);
-    }
-
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class UserHomeActivityContentFragment extends Fragment {
+    public static class PlaceholderFragment extends Fragment {
 
-        public UserHomeActivityContentFragment() {
+        public PlaceholderFragment() {
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_user_home, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_household, container, false);
             return rootView;
         }
     }
-
 }

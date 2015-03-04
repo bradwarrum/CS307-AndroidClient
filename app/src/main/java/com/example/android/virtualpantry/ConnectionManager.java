@@ -35,6 +35,7 @@ public class ConnectionManager {
     private static final String host = "104.236.87.206";
     private static String response = null;
     private static String token = null;
+    public static String lastResponseSaved = null;
 
     public static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -183,7 +184,7 @@ public class ConnectionManager {
         return userInfo;
     }
 
-    public int createHousehold(String name, String description) throws IOException {
+    public static int createHousehold(String name, String description) throws IOException {
         int rcode;
         Transaction request = new Transaction(protocol, host, port, "/households/create?token=" + token);
         request.setPostMethod();
@@ -192,6 +193,7 @@ public class ConnectionManager {
         rcode = request.getResponseCode();
         try {
             response = request.getResponse();
+            lastResponseSaved = response;
         }catch (IOException e) {}
         request.close();
         return rcode;
