@@ -134,4 +134,42 @@ public class JSONModels {
             householdDescription = description;
         }
     }
+
+    public static class GetListResJSON{
+        private final long version;
+        private final String name;
+        private final List<ItemJSON> items;
+
+        public GetListResJSON(long version, String name, List<ItemJSON> items){
+            this.version = version;
+            this.name = name;
+            this.items = items;
+        }
+    }
+
+    public static class ItemJSON{
+        private final String UPC;
+        private final String description;
+        private final int quantity;
+        private final int fractional;
+        private final String unitName;
+
+        public ItemJSON(String UPC, String description, int quantity, int fractional, String unitName){
+            this.UPC = UPC;
+            this.description = description;
+            this.quantity = quantity;
+            this.fractional = fractional;
+            this.unitName = unitName;
+        }
+    }
+
+    public static class LinkReqJSON {
+        private final String description;
+        private final String unitName;
+
+        public LinkReqJSON(String description, String units) {
+            this.description = description;
+            this.unitName = units;
+        }
+    }
 }
