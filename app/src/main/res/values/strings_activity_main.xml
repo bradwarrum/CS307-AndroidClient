@@ -3,5 +3,6 @@
     <string name="login_button">Log In</string>
     <string name="welcomeString">Welcome to Virtual Pantry!</string>
     <string name="Main_activity_login_button_text">Log In</string>
+    <string name="Main_activity_register_button_text">Register</string>
 
 </resources>

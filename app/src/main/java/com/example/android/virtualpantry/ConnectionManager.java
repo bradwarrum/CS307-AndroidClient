@@ -123,7 +123,7 @@ public class ConnectionManager {
         request.send(reqstr);
         rcode = request.getResponseCode();
         request.close();
-        if(rcode != CREATED || rcode != FORBIDDEN || rcode != BAD_REQUEST){
+        if(rcode != CREATED && rcode != FORBIDDEN && rcode != BAD_REQUEST){
             Log.e("Register", "Register return code not expected: " + rcode);
         }
         return rcode;
@@ -204,7 +204,7 @@ public class ConnectionManager {
     }
 
 
-    public void getHousehold(int householdID) throws IOException{
+    public int getHousehold(int householdID) throws IOException{
         int rcode = 0;
         Transaction request = new Transaction(protocol, host, port, "/households/" + householdID +"?token=" + token);
         request.setGetMethod();
@@ -212,8 +212,14 @@ public class ConnectionManager {
         System.out.println("HTTP " + rcode);
         try {
             response = request.getResponse();
-        }catch (IOException e) {}
-	}
+
+        }catch (IOException e) {
+            Log.e("getHousehold", "Failed to get household", e);
+        } finally {
+            request.close();
+        }
+        return rcode;
+    }
     public void link(long householdID, String UPC, String description, String unitName)throws IOException {
         int rcode;
         Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/link?token=" + token);

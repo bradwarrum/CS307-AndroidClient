@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+    private UserRegisterTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -45,12 +46,13 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
     private AutoCompleteTextView mLastNameView;
     private View mProgressView;
     private View mLoginFormView;
+    private TextView mRegisterMessage;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_register);
         setupActionBar();
 
         // Set up the login form.
@@ -73,15 +75,16 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
         mLastNameView = (AutoCompleteTextView) findViewById(R.id.lastName);
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        /*mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
-        });
+        });*/
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        mRegisterMessage = (TextView) findViewById(R.id.register_message);
     }
 
     private void populateAutoComplete() {
@@ -104,7 +107,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    public void attemptLogin() {
+    public void attemptRegister(View view) {
         if (mAuthTask != null) {
             return;
         }
@@ -142,7 +145,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
             cancel = true;
         }
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -167,7 +170,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password, firstName, lastName);
+            mAuthTask = new UserRegisterTask(email, password, firstName, lastName);
             mAuthTask.execute((Void) null);
         }
     }
@@ -179,7 +182,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 0;
+        return password.length() > 1;
     }
 
     /**
@@ -276,14 +279,15 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserRegisterTask extends AsyncTask<Void, Void, Boolean> {
 
+        private static final String LOG_TAG = "UserRegisterTask";
         private final String mEmail;
         private final String mPassword;
         private final String mFirstName;
         private final String mLastName;
 
-        UserLoginTask(String email, String password, String mFirstName, String mLastName) {
+        UserRegisterTask(String email, String password, String mFirstName, String mLastName) {
             mEmail = email;
             mPassword = password;
             this.mFirstName = mFirstName;
@@ -296,11 +300,12 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
             try {
                 response = ConnectionManager.register(mEmail, mPassword, mFirstName, mLastName);
             } catch (IOException e){
-                Log.e("LOG_TAG", "Error in connection process", e);
+                Log.e(LOG_TAG, "Error in connection process", e);
             }
-            if(response == ConnectionManager.OK){
+            if(response == ConnectionManager.CREATED){
                 return true;
             }
+            Log.e(LOG_TAG, "Unexpected return code: " + response + " was expecting: " + ConnectionManager.CREATED);
             return false;
         }
 
@@ -308,7 +313,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
-
+            mRegisterMessage.setText(ConnectionManager.lastResponseSaved);
             if (success) {
                 finish();
             } else {
