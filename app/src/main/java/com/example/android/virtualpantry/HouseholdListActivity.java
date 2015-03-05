@@ -96,8 +96,8 @@ public class HouseholdListActivity extends Activity {
             //TODO: subtitle, most likely needs a full refactor
             mHouseholdAdapater = new ArrayAdapter<String>(
                     getActivity(),
-                    R.layout.list_item_household,
-                    R.id.list_item_household_textview,
+                    R.layout.basic_list_item,
+                    R.id.basic_list_item_textview,
                     householdNames);
 
             View rootView = inflater.inflate(R.layout.fragment_household_list, container, false);
@@ -119,8 +119,8 @@ public class HouseholdListActivity extends Activity {
             //TODO: subtitle, most likely needs a full refactor
             mHouseholdAdapater = new ArrayAdapter<String>(
                     getActivity(),
-                    R.layout.list_item_household,
-                    R.id.list_item_household_textview,
+                    R.layout.basic_list_item,
+                    R.id.basic_list_item_textview,
                     householdNames);
             mHouseholdList.setAdapter(mHouseholdAdapater);
         }

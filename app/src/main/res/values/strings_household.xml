@@ -5,4 +5,7 @@
     <string name="Create_household_description_hint">Household Description</string>
     <string name="Create_household_button_text">Create Household</string>
     <string name="Create_household_button_text_list">Create new household</string>
+    <string name="Household_title_filler">Household</string>
+    <string name="Household_description_filler">Household description</string>
+    <string name="Household_create_new_list_button_text">Create new list</string>
 </resources>

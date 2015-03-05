@@ -198,4 +198,16 @@ public class ConnectionManager {
         request.close();
         return rcode;
     }
+
+    public void getHousehold(int householdID) throws IOException{
+        int rcode = 0;
+        Transaction request = new Transaction(protocol, host, port, "/households/" + householdID +"?token=" + token);
+        request.setGetMethod();
+        rcode = request.getResponseCode();
+        System.out.println("HTTP " + rcode);
+        try {
+            response = request.getResponse();
+        }catch (IOException e) {}
+        request.close();
+    }
 }
