@@ -215,4 +215,11 @@ public class JSONModels {
             this.listName = listName;
         }
     }
+
+    public static class ListCreateReqJSON {
+        private final String listName;
+        public ListCreateReqJSON (String name) {
+            listName = name;
+        }
+    }
 }

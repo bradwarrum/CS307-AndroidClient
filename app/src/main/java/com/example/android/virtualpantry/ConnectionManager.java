@@ -164,7 +164,6 @@ public class ConnectionManager {
     }
 
     public static JSONModels.UserInfoResJSON getUserInfo() throws IOException {
-
         int rcode;
         String url;
         JSONModels.UserInfoResJSON userInfo = null;
@@ -229,5 +228,24 @@ public class ConnectionManager {
         request.send(reqstr);
         rcode = request.getResponseCode();
         request.close();
+    }
+
+    public static int createList(String listName, long householdID) throws IOException {
+        int rcode = 0;
+        Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/lists/create?token=" + token);
+        request.setPostMethod();
+        String reqstr = gson.toJson(new JSONModels.ListCreateReqJSON(listName));
+        request.send(reqstr);
+        rcode = request.getResponseCode();
+        try {
+            response = request.getResponse();
+        }catch (IOException e) {
+            Log.e("createList", "failed to create list", e);
+        }
+        finally {
+            request.close();
+        }
+        return rcode;
+
     }
 }
