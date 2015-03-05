@@ -204,21 +204,22 @@ public class ConnectionManager {
     }
 
 
-    public int getHousehold(int householdID) throws IOException{
+    public static JSONModels.HouseholdJSON getHousehold(long householdID) throws IOException{
         int rcode = 0;
+        JSONModels.HouseholdJSON householdJSON = null;
         Transaction request = new Transaction(protocol, host, port, "/households/" + householdID +"?token=" + token);
         request.setGetMethod();
         rcode = request.getResponseCode();
         System.out.println("HTTP " + rcode);
         try {
             response = request.getResponse();
-
+            householdJSON = gson.fromJson(response, JSONModels.HouseholdJSON.class);
         }catch (IOException e) {
             Log.e("getHousehold", "Failed to get household", e);
         } finally {
             request.close();
         }
-        return rcode;
+        return householdJSON;
     }
     public void link(long householdID, String UPC, String description, String unitName)throws IOException {
         int rcode;

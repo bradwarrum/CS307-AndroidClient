@@ -39,14 +39,14 @@ public class JSONModels {
         public final String firstName;
         public final String lastName;
         public final String emailAddress;
-        public final List<HouseholdJSON> households;
+        public final List<HouseholdShortJSON> households;
 
         public UserInfoResJSON(
                 long userID,
                 String firstName,
                 String lastName,
                 String emailAddress,
-                List<HouseholdJSON> households) {
+                List<HouseholdShortJSON> households) {
             this.userID = userID;
             this.firstName = firstName;
             this.lastName = lastName;
@@ -82,17 +82,17 @@ public class JSONModels {
             firstName = in.readString();
             lastName = in.readString();
             emailAddress = in.readString();
-            households = new ArrayList<HouseholdJSON>();
-            in.readTypedList(households, HouseholdJSON.CREATOR);
+            households = new ArrayList<HouseholdShortJSON>();
+            in.readTypedList(households, HouseholdShortJSON.CREATOR);
         }
     }
 
-    public static class HouseholdJSON implements Parcelable {
+    public static class HouseholdShortJSON implements Parcelable {
         public final long householdID;
         public final String householdName;
         public final String householdDescription;
 
-        public HouseholdJSON(long householdID, String householdName, String householdDescription) {
+        public HouseholdShortJSON(long householdID, String householdName, String householdDescription) {
             this.householdID = householdID;
             this.householdName = householdName;
             this.householdDescription = householdDescription;
@@ -108,18 +108,18 @@ public class JSONModels {
             out.writeString(householdDescription);
         }
 
-        public static final Parcelable.Creator<HouseholdJSON> CREATOR =
-            new Parcelable.Creator<HouseholdJSON>() {
-                public HouseholdJSON createFromParcel(Parcel in) {
-                    return new HouseholdJSON(in);
+        public static final Parcelable.Creator<HouseholdShortJSON> CREATOR =
+            new Parcelable.Creator<HouseholdShortJSON>() {
+                public HouseholdShortJSON createFromParcel(Parcel in) {
+                    return new HouseholdShortJSON(in);
                 }
 
-                public HouseholdJSON[] newArray(int size) {
-                    return new HouseholdJSON[size];
+                public HouseholdShortJSON[] newArray(int size) {
+                    return new HouseholdShortJSON[size];
                 }
             };
 
-        private HouseholdJSON(Parcel in) {
+        private HouseholdShortJSON(Parcel in) {
             householdID = in.readLong();
             householdName = in.readString();
             householdDescription = in.readString();
@@ -148,11 +148,11 @@ public class JSONModels {
     }
 
     public static class ItemJSON{
-        private final String UPC;
-        private final String description;
-        private final int quantity;
-        private final int fractional;
-        private final String unitName;
+        public final String UPC;
+        public final String description;
+        public final int quantity;
+        public final int fractional;
+        public final String unitName;
 
         public ItemJSON(String UPC, String description, int quantity, int fractional, String unitName){
             this.UPC = UPC;
@@ -164,12 +164,55 @@ public class JSONModels {
     }
 
     public static class LinkReqJSON {
-        private final String description;
-        private final String unitName;
+        public final String description;
+        public final String unitName;
 
         public LinkReqJSON(String description, String units) {
             this.description = description;
             this.unitName = units;
+        }
+    }
+    
+    public static class HouseholdJSON{
+        public final long householdId;
+        public final String householdName;
+        public final String householdDescription;
+        public final String headOfHousehold;
+        public final List<HouseholdMemberJSON> members;
+        public final List<HouseholdListJSON> lists;
+
+        public HouseholdJSON(long householdId, String householdName, String householdDescription, String headOfHousehold,
+                             List<HouseholdMemberJSON> members, List<HouseholdListJSON> lists) {
+            this.householdId = householdId;
+            this.householdName = householdName;
+            this.householdDescription = householdDescription;
+            this.headOfHousehold = headOfHousehold;
+            this.members = members;
+            this.lists = lists;
+        }
+    }
+    
+    public static class HouseholdMemberJSON{
+        public final String userID;
+        public final String firstName;
+        public final String lastName;
+        public final String emailAddress;
+
+        public HouseholdMemberJSON(String userID, String firstName, String lastName, String emailAddress){
+            this.userID = userID;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.emailAddress = emailAddress;
+        }
+    }
+    
+    public static class HouseholdListJSON{
+        public final long listID;
+        public final String listName;
+
+        public HouseholdListJSON(long listID, String listName) {
+            this.listID = listID;
+            this.listName = listName;
         }
     }
 }

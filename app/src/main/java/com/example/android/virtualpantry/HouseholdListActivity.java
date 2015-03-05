@@ -9,11 +9,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.android.virtualpantry.Data.Household;
+import com.example.android.virtualpantry.Data.HouseholdBrief;
 import com.example.android.virtualpantry.Data.JSONModels;
 import com.example.android.virtualpantry.Data.UserInfo;
 
@@ -43,7 +44,7 @@ public class HouseholdListActivity extends Activity {
     protected void onResume() {
         super.onResume();
         TextView message = (TextView) findViewById(R.id.household_list_message);
-        message.setText("You have: " + UserInfo.getUserInfo().getHouseholds().size() + " active households");
+        message.setText("You have: " + UserInfo.getUserInfo().getHouseholdBriefs().size() + " active households");
     }
 
     @Override
@@ -89,9 +90,9 @@ public class HouseholdListActivity extends Activity {
                                  Bundle savedInstanceState) {
             List<String> householdNames = new ArrayList<String>();
             List<String> householdDescriptions = new ArrayList<String>();
-            for(Household household : UserInfo.getUserInfo().getHouseholds()){
-                householdNames.add(household.getHouseholdName());
-                householdDescriptions.add(household.getHouseholdDescription());
+            for(HouseholdBrief householdBrief : UserInfo.getUserInfo().getHouseholdBriefs()){
+                householdNames.add(householdBrief.getHouseholdName());
+                householdDescriptions.add(householdBrief.getHouseholdDescription());
             }
             //TODO: subtitle, most likely needs a full refactor
             mHouseholdAdapater = new ArrayAdapter<String>(
@@ -104,6 +105,15 @@ public class HouseholdListActivity extends Activity {
 
             mHouseholdList = (ListView) rootView.findViewById(R.id.listview_households);
             mHouseholdList.setAdapter(mHouseholdAdapater);
+            mHouseholdList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String household = mHouseholdAdapater.getItem(position);
+                    Intent intent = new Intent(getActivity(), HouseholdActivity.class);
+                    intent.putExtra("household", household);
+                    startActivity(intent);
+                }
+            });
             return rootView;
         }
 
@@ -112,9 +122,9 @@ public class HouseholdListActivity extends Activity {
             super.onResume();
             List<String> householdNames = new ArrayList<String>();
             List<String> householdDescriptions = new ArrayList<String>();
-            for(Household household : UserInfo.getUserInfo().getHouseholds()){
-                householdNames.add(household.getHouseholdName());
-                householdDescriptions.add(household.getHouseholdDescription());
+            for(HouseholdBrief householdBrief : UserInfo.getUserInfo().getHouseholdBriefs()){
+                householdNames.add(householdBrief.getHouseholdName());
+                householdDescriptions.add(householdBrief.getHouseholdDescription());
             }
             //TODO: subtitle, most likely needs a full refactor
             mHouseholdAdapater = new ArrayAdapter<String>(

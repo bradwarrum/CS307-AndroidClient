@@ -87,6 +87,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="HouseholdListActivity" />
         </activity>
+        <activity
+            android:name=".CreateShoppingList"
+            android:label="@string/title_activity_create_shopping_list"
+            android:parentActivityName=".HouseholdActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="HouseholdActivity" />
+        </activity>
     </application>
 
 </manifest>

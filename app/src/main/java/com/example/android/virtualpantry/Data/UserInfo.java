@@ -14,7 +14,7 @@ public class UserInfo {
     private String firstName;
     private String lastName;
     private String emailAddress;
-    private List<Household> households;
+    private List<HouseholdBrief> householdBriefs;
 
 
     public static synchronized UserInfo getUserInfo(){
@@ -30,9 +30,9 @@ public class UserInfo {
         firstName = userInfoJSON.firstName;
         lastName = userInfoJSON.lastName;
         emailAddress = userInfoJSON.emailAddress;
-        households = new ArrayList<Household>();
-        for(JSONModels.HouseholdJSON householdJSON : userInfoJSON.households){
-            households.add(new Household(householdJSON));
+        householdBriefs = new ArrayList<HouseholdBrief>();
+        for(JSONModels.HouseholdShortJSON householdShortJSON : userInfoJSON.households){
+            householdBriefs.add(new HouseholdBrief(householdShortJSON));
         }
     }
 
@@ -53,8 +53,8 @@ public class UserInfo {
         return emailAddress;
     }
 
-    public List<Household> getHouseholds() {
-        return households;
+    public List<HouseholdBrief> getHouseholdBriefs() {
+        return householdBriefs;
     }
     //endregion
 

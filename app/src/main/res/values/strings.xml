@@ -6,4 +6,5 @@
     <string name="title_activity_household__list_">Household_List_Activity</string>
     <string name="title_activity_create_household">CreateHouseholdActivity</string>
     <string name="title_activity_household">HouseholdActivity</string>
+    <string name="title_activity_create_shopping_list">CreateShoppingList</string>
 </resources>
