@@ -246,6 +246,24 @@ public class ConnectionManager {
             request.close();
         }
         return rcode;
+    }
+
+    public static JSONModels.GetShoppingListResJSON getList(long householdID, long listID) throws IOException{
+        JSONModels.GetShoppingListResJSON returnJSON = null;
+        int rcode;
+        Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/lists/" + listID + "?token=" + token);
+        request.setGetMethod();
+        rcode = request.getResponseCode();
+        try {
+            response = request.getResponse();
+            returnJSON = gson.fromJson(response, JSONModels.GetShoppingListResJSON.class);
+        }catch (IOException e) {
+            Log.e("getList", "Failed to get list", e);
+            return null;
+        } finally{
+            request.close();
+        }
+        return returnJSON;
 
     }
 }
