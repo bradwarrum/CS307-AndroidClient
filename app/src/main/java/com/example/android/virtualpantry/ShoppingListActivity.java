@@ -3,8 +3,8 @@ package com.example.android.virtualpantry;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
+import android.app.Fragment;
+import android.app.Activity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,14 +20,14 @@ import com.example.android.virtualpantry.Data.JSONModels;
 import java.io.IOException;
 
 
-public class ShoppingListActivity extends ActionBarActivity {
+public class ShoppingListActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
+            getFragmentManager().beginTransaction()
                     .add(R.id.container, new ShoppingListFragment())
                     .commit();
         }
@@ -111,6 +111,15 @@ public class ShoppingListActivity extends ActionBarActivity {
         public void updateListInfo(JSONModels.GetShoppingListResJSON listJSON){
             this.listJSON = listJSON;
             mShoppingListTitle.setText(listJSON.name);
+            mListDeleteButton.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v){
+                            DeleteListTask deleteListTask = new DeleteListTask(householdID, listID);
+                            deleteListTask.execute((Void) null);
+                        }
+                    }
+            );
             mShoppingListVersion.setText("" + listJSON.version);
         }
 
@@ -134,9 +143,9 @@ public class ShoppingListActivity extends ActionBarActivity {
                     Log.e(LOG_TAG, "Failed to getting shooping list", e);
                 }
                 if(shoppingListJSON == null){
+                    Log.e(LOG_TAG, "Shopping list response was null");
                     return false;
                 }
-                Log.e(LOG_TAG, "Shopping list response was null");
                 return true;
             }
 
@@ -144,6 +153,34 @@ public class ShoppingListActivity extends ActionBarActivity {
             protected void onPostExecute(Boolean success) {
                 if(success){
                     updateListInfo(shoppingListJSON);
+                }
+            }
+        }
+
+        public class DeleteListTask extends AsyncTask<Void, Void, Boolean>{
+
+            private long listID;
+            private long householdID;
+
+            public DeleteListTask(long householdID, long listID) {
+                this.listID = listID;
+                this.householdID = householdID;
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    return ConnectionManager.removeList(householdID, listID);
+                } catch (IOException e){
+                    Log.e("deleteListTask", "Failed to delete list", e);
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                if(success){
+                    getActivity().finish();
                 }
             }
         }

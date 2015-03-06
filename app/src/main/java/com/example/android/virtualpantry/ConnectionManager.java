@@ -220,6 +220,8 @@ public class ConnectionManager {
         }
         return householdJSON;
     }
+
+
     public void link(long householdID, String UPC, String description, String unitName)throws IOException {
         int rcode;
         Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/link?token=" + token);
@@ -241,6 +243,7 @@ public class ConnectionManager {
             response = request.getResponse();
         }catch (IOException e) {
             Log.e("createList", "failed to create list", e);
+            Log.e("createList", "json=" + reqstr);
         }
         finally {
             request.close();
@@ -265,5 +268,25 @@ public class ConnectionManager {
         }
         return returnJSON;
 
+    }
+
+
+    public static boolean removeList(long householdID, long listID) throws IOException{
+        int rcode;
+        Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/lists/" + listID + "/remove?token=" + token);
+        request.setPostMethod();
+        rcode = request.getResponseCode();
+        try {
+            response = request.getResponse();
+        }catch (IOException e) {
+            Log.e("getList", "Failed to get list", e);
+               return false;
+        } finally{
+            request.close();
+        }
+        if(rcode == ConnectionManager.OK){
+            return true;
+        }
+        return false;
     }
 }
