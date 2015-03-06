@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.virtualpantry.Data.JSONModels;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -77,6 +78,7 @@ public class ShoppingListActivity extends Activity {
         private Button mAddItemButton;
         private ListView mList;
         private ArrayAdapter<String> mListAdapter;
+        private Button mScanCheckoff;
 
 
 
@@ -102,6 +104,7 @@ public class ShoppingListActivity extends Activity {
             mShoppingListTitle = (TextView) rootView.findViewById(R.id.shopping_list_title);
             mShoppingListVersion = (TextView) rootView.findViewById(R.id.shopping_list_version_no);
             mAddItemButton = (Button) rootView.findViewById(R.id.add_item_button);
+            mScanCheckoff = (Button) rootView.findViewById(R.id.scan_checkoff);
             mList = (ListView) rootView.findViewById(R.id.shopping_item_list);
             mListAdapter = new ArrayAdapter<String>(
                     getActivity(),
@@ -129,7 +132,7 @@ public class ShoppingListActivity extends Activity {
             mListDeleteButton.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
-                        public void onClick(View v){
+                        public void onClick(View v) {
                             DeleteListTask deleteListTask = new DeleteListTask(householdID, listID);
                             deleteListTask.execute((Void) null);
                         }
@@ -157,6 +160,13 @@ public class ShoppingListActivity extends Activity {
                     deleteItem.execute((Void) null);
                 }
             });
+            mScanCheckoff.setOnClickListener(new View.OnClickListener() {
+                 @Override
+                 public void onClick(View v){
+                     IntentIntegrator intentIntegrator = new IntentIntegrator(ShoppingListFragment.this);
+                     intentIntegrator.initiateScan();
+                 }
+            });
             ArrayList<String> listItems = new ArrayList<String>();
             String item;
             for(JSONModels.GetShoppingListResJSON.Item itemObj : listJSON.items){
@@ -173,6 +183,21 @@ public class ShoppingListActivity extends Activity {
 
         }
 
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+            IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+            if(intentResult != null){
+                String barcode = intentResult.getContents();
+                DeleteItemTask deleteItem = new DeleteItemTask(householdID, listID, Long.parseLong(mShoppingListVersion.getText().toString()), barcode, 0, 0);
+                deleteItem.execute((Void) null);
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Removing Item.", Toast.LENGTH_SHORT);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(), "No data.", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+
+        }
 
         public class GetListTask extends AsyncTask<Void, Void, Boolean>{
 
