@@ -251,5 +251,76 @@ public class JSONModels {
         }
     }
 
+    public static class GetDescriptionResJSON{
+        public final String UPC;
+        public final long householdID;
+        public final String currentDescription;
+        public final List<InternalSuggestionJSON> internalSuggestions;
+        public final List<ExternalSuggestionJSON> externalSuggestions;
+
+        public GetDescriptionResJSON(String UPC, long householdID, String currentDescription,
+                                     List<InternalSuggestionJSON> internalSuggestions,
+                                     List<ExternalSuggestionJSON> externalSuggestions) {
+            this.UPC = UPC;
+            this.householdID = householdID;
+            this.currentDescription = currentDescription;
+            this.internalSuggestions = internalSuggestions;
+            this.externalSuggestions = externalSuggestions;
+        }
+
+        public class InternalSuggestionJSON{
+            public final long householdID;
+            public final String description;
+
+            public InternalSuggestionJSON(long householdID, String description) {
+                this.householdID = householdID;
+                this.description = description;
+            }
+        }
+
+        public class ExternalSuggestionJSON{
+            public final String source;
+            public final String description;
+
+            public ExternalSuggestionJSON(String source, String description) {
+                this.source = source;
+                this.description = description;
+            }
+        }
+    }
+
+    public static class LinkUPCReqJSON{
+        private String description;
+        private String unitName;
+
+        public LinkUPCReqJSON(String description, String unitName){
+            this.description = description;
+            this.unitName = unitName;
+        }
+    }
+
+    public static class UpdateListJSON {
+        private long version;
+        private List<UpdateItemJSON> items;
+
+        public UpdateListJSON(long version, String UPC, int quantity, int fractional){
+            this.version = version;
+            this.items = new ArrayList<UpdateItemJSON>();
+            this.items.add(new UpdateItemJSON(UPC, quantity, fractional));
+        }
+
+        public class UpdateItemJSON{
+            private String UPC;
+            private int quantity;
+            private int fractional;
+
+            public UpdateItemJSON(String UPC, int quantity, int fractional){
+                this.UPC = UPC;
+                this.quantity = quantity;
+                this.fractional = fractional;
+            }
+        }
+    }
+
 
 }

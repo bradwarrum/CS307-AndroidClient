@@ -8,4 +8,5 @@
     <string name="title_activity_household">HouseholdActivity</string>
     <string name="title_activity_create_shopping_list">CreateShoppingList</string>
     <string name="title_activity_shopping_list">ShoppingListActivity</string>
+    <string name="title_activity_add_item_to_list">AddItemToListActivity</string>
 </resources>

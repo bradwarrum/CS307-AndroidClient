@@ -11,13 +11,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.virtualpantry.Data.JSONModels;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class ShoppingListActivity extends Activity {
@@ -71,6 +76,7 @@ public class ShoppingListActivity extends Activity {
         private TextView mShoppingListVersion;
         private Button mAddItemButton;
         private ListView mList;
+        private ArrayAdapter<String> mListAdapter;
 
 
 
@@ -97,6 +103,13 @@ public class ShoppingListActivity extends Activity {
             mShoppingListVersion = (TextView) rootView.findViewById(R.id.shopping_list_version_no);
             mAddItemButton = (Button) rootView.findViewById(R.id.add_item_button);
             mList = (ListView) rootView.findViewById(R.id.shopping_item_list);
+            mListAdapter = new ArrayAdapter<String>(
+                    getActivity(),
+                    R.layout.basic_list_item,
+                    R.id.basic_list_item_textview,
+                    new ArrayList<String>()
+            );
+            mList.setAdapter(mListAdapter);
 
             return rootView;
         }
@@ -108,7 +121,9 @@ public class ShoppingListActivity extends Activity {
             getList.execute((Void) null);
         }
 
-        public void updateListInfo(JSONModels.GetShoppingListResJSON listJSON){
+
+
+        public void updateListInfo(final JSONModels.GetShoppingListResJSON listJSON){
             this.listJSON = listJSON;
             mShoppingListTitle.setText(listJSON.name);
             mListDeleteButton.setOnClickListener(
@@ -121,7 +136,43 @@ public class ShoppingListActivity extends Activity {
                     }
             );
             mShoppingListVersion.setText("" + listJSON.version);
+            mAddItemButton.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(getActivity(), AddItemToListActivity.class);
+                            intent.putExtra("householdID", householdID);
+                            intent.putExtra("listID", listID);
+                            intent.putExtra("version", listJSON.version);
+                            startActivity(intent);
+                        }
+                    }
+            );
+            mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String item = mListAdapter.getItem(position);
+                    String UPC = item.split(":")[0];
+                    DeleteItemTask deleteItem = new DeleteItemTask(householdID, listID, Long.parseLong(mShoppingListVersion.getText().toString()), UPC, 0, 0);
+                    deleteItem.execute((Void) null);
+                }
+            });
+            ArrayList<String> listItems = new ArrayList<String>();
+            String item;
+            for(JSONModels.GetShoppingListResJSON.Item itemObj : listJSON.items){
+                item = "";
+                item = item + itemObj.UPC + ":" + itemObj.description + " - " + itemObj.quantity;
+                if(itemObj.fractional != 1){
+                    item = item + "/" + itemObj.fractional;
+                }
+                item = item + " " + itemObj.unitName;
+                listItems.add(item);
+            }
+            mListAdapter.clear();
+            mListAdapter.addAll(listItems);
+
         }
+
 
         public class GetListTask extends AsyncTask<Void, Void, Boolean>{
 
@@ -181,6 +232,49 @@ public class ShoppingListActivity extends Activity {
             protected void onPostExecute(Boolean success) {
                 if(success){
                     getActivity().finish();
+                }
+            }
+        }
+
+        public class DeleteItemTask extends AsyncTask<Void, Void, Boolean>{
+
+            private long householdID;
+            private long listID;
+            private long version;
+            private String UPC;
+            private int quantity;
+            private int fraction;
+
+            public DeleteItemTask(long householdID, long listID, long version, String UPC, int quanity, int fraction) {
+                this.householdID = householdID;
+                this.listID = listID;
+                this.version = version;
+                this.UPC = UPC;
+                this.quantity = quanity;
+                this.fraction = fraction;
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                int rcode = 0;
+                try{
+                    rcode = ConnectionManager.addItem(householdID, listID, version, UPC, quantity, fraction);
+                } catch (IOException e){
+                    Log.e("LinkAndAddTask", "Failed to add", e);
+                    return false;
+                }
+                if(rcode != ConnectionManager.OK){
+                    Log.e("LinkAndAddTasK", "Got bad return code add: " + rcode);
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                if(success){
+                    GetListTask getList = new GetListTask(householdID, listID);
+                    getList.execute((Void) null);
                 }
             }
         }

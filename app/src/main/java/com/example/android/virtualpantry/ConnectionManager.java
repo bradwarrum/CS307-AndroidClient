@@ -289,4 +289,81 @@ public class ConnectionManager {
         }
         return false;
     }
+
+    public static JSONModels.GetDescriptionResJSON getDescriptions(long householdID, String UPC) throws IOException{
+        JSONModels.GetDescriptionResJSON returnJSON = null;
+        int rcode;
+        Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/suggestions?token=" + token);
+        request.setGetMethod();
+        rcode = request.getResponseCode();
+        try {
+            response = request.getResponse();
+            returnJSON = gson.fromJson(response, JSONModels.GetDescriptionResJSON.class);
+        }catch (IOException e) {
+            Log.e("getList", "Failed to get description", e);
+            return null;
+        } finally{
+            request.close();
+        }
+        return returnJSON;
+    }
+
+    public static int linkItemOld(long householdID, String UPC, String description, String unitName) throws IOException {
+        int rcode = 0;
+        Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/link?token=" + token);
+        request.setPostMethod();
+        String reqstr = gson.toJson(new JSONModels.LinkUPCReqJSON(description, unitName));
+        Log.v("linkItem", "regstr=" + reqstr);
+        request.send(reqstr);
+        rcode = request.getResponseCode();
+        try {
+            response = request.getResponse();
+            lastResponseSaved = response;
+        }catch (IOException e) {
+            Log.e("linkItem", "Unkwnon", e);
+        }
+        finally {
+            request.close();
+        }
+        return rcode;
+    }
+
+    public static int linkItem(long householdID, String UPC, String description, String unitName)throws IOException {
+        int rcode = 0;
+        Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/items/" + UPC + "/link?token=" + token);
+        request.setPostMethod();
+        String reqstr = gson.toJson(new JSONModels.LinkReqJSON(description, unitName));
+        Log.v("linkItem", "regstr=" + reqstr);
+        request.send(reqstr);
+        try {
+            response = request.getResponse();
+            rcode = request.getResponseCode();
+            lastResponseSaved = response;
+        }catch (IOException e) {
+            Log.e("linkItem", "Failed", e);
+        }
+        finally {
+            request.close();
+        }
+        return rcode;
+    }
+
+    public static int addItem(long householdID, long listID, long version, String UPC, int quantity, int fractional) throws IOException {
+        int rcode = 0;
+        Transaction request = new Transaction(protocol, host, port, "/households/" + householdID + "/lists/" + listID + "/update?token=" + token);
+        request.setPostMethod();
+        String reqstr = gson.toJson(new JSONModels.UpdateListJSON(version, UPC, quantity, fractional));
+        request.send(reqstr);
+        rcode = request.getResponseCode();
+        try {
+            response = request.getResponse();
+            lastResponseSaved = response;
+        }catch (IOException e) {
+            Log.e("addItem", "Unkwnon", e);
+        }
+        finally {
+            request.close();
+        }
+        return rcode;
+    }
 }
