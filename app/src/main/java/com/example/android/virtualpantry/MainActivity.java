@@ -59,6 +59,11 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
     }
+		
+		public void goToBarcodeScanner(View view) {
+        Intent intent = new Intent(this, BarcodeActivity.class);
+        startActivity(intent);
+    }
 
     /**
      * A placeholder fragment containing a simple view.
