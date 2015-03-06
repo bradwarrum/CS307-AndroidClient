@@ -1,5 +1,6 @@
 package com.example.android.virtualpantry;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.android.virtualpantry.Data.JSONModels;
 
@@ -58,6 +62,17 @@ public class ShoppingListActivity extends ActionBarActivity {
     public static class ShoppingListFragment extends Fragment {
 
         private static final String LOG_TAG = "ShoppingListFragment";
+        private JSONModels.GetShoppingListResJSON listJSON = null;
+        private long householdID = -1;
+        private long listID = -1;
+
+        private Button mListDeleteButton;
+        private TextView mShoppingListTitle;
+        private TextView mShoppingListVersion;
+        private Button mAddItemButton;
+        private ListView mList;
+
+
 
         public ShoppingListFragment() {
         }
@@ -66,13 +81,44 @@ public class ShoppingListActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_shopping_list, container, false);
+            Intent myIntent = getActivity().getIntent();
+            if(myIntent.hasExtra("householdID")){
+                householdID = myIntent.getLongExtra("householdID", -1);
+            }
+            if(myIntent.hasExtra("listID")){
+                listID = myIntent.getLongExtra("listID", -1);
+            }
+            if(householdID == -1 || listID == -1){
+                Log.e(LOG_TAG, "Error retriving household and list ID");
+                getActivity().finish();
+            }
+            mListDeleteButton = (Button) rootView.findViewById(R.id.delete_list_button);
+            mShoppingListTitle = (TextView) rootView.findViewById(R.id.shopping_list_title);
+            mShoppingListVersion = (TextView) rootView.findViewById(R.id.shopping_list_version_no);
+            mAddItemButton = (Button) rootView.findViewById(R.id.add_item_button);
+            mList = (ListView) rootView.findViewById(R.id.shopping_item_list);
+
             return rootView;
+        }
+
+        @Override
+        public void onResume(){
+            super.onResume();
+            GetListTask getList = new GetListTask(householdID, listID);
+            getList.execute((Void) null);
+        }
+
+        public void updateListInfo(JSONModels.GetShoppingListResJSON listJSON){
+            this.listJSON = listJSON;
+            mShoppingListTitle.setText(listJSON.name);
+            mShoppingListVersion.setText("" + listJSON.version);
         }
 
         public class GetListTask extends AsyncTask<Void, Void, Boolean>{
 
             private long listID;
             private long householdID;
+            private JSONModels.GetShoppingListResJSON shoppingListJSON;
 
             public GetListTask(long householdID, long listID) {
                 this.householdID = householdID;
@@ -81,7 +127,7 @@ public class ShoppingListActivity extends ActionBarActivity {
 
             @Override
             protected Boolean doInBackground(Void... params) {
-                JSONModels.GetShoppingListResJSON shoppingListJSON = null;
+                shoppingListJSON = null;
                 try{
                     shoppingListJSON = ConnectionManager.getList(householdID, listID);
                 } catch (IOException e){
@@ -90,12 +136,15 @@ public class ShoppingListActivity extends ActionBarActivity {
                 if(shoppingListJSON == null){
                     return false;
                 }
+                Log.e(LOG_TAG, "Shopping list response was null");
                 return true;
             }
 
             @Override
             protected void onPostExecute(Boolean success) {
-
+                if(success){
+                    updateListInfo(shoppingListJSON);
+                }
             }
         }
     }

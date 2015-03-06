@@ -129,7 +129,6 @@ public class HouseholdActivity extends Activity {
             mShoppingListView = (ListView) rootView.findViewById(R.id.listview_household);
             mShoppingListView.setAdapter(mShoppingListsAdapter);
 
-
             GetHouseholdDataTask householdDataTask = new GetHouseholdDataTask(householdID);
             householdDataTask.execute((Void) null);
             return rootView;
@@ -138,6 +137,8 @@ public class HouseholdActivity extends Activity {
         @Override
         public void onResume(){
             super.onResume();
+            GetHouseholdDataTask householdDataTask = new GetHouseholdDataTask(householdID);
+            householdDataTask.execute((Void) null);
         }
 
         public void createNewList(){
@@ -152,6 +153,7 @@ public class HouseholdActivity extends Activity {
 
         public void updateTextFields(JSONModels.HouseholdJSON householdJSON){
             this.householdJSON = householdJSON;
+            final JSONModels.HouseholdJSON finalHouseholdJSON = householdJSON;
             mScreenHeader.setText(householdJSON.householdName);
             mScreenSubtitle.setText(householdJSON.householdDescription);
             String members = "";
@@ -174,6 +176,20 @@ public class HouseholdActivity extends Activity {
             }
             mShoppingListsAdapter.clear();
             mShoppingListsAdapter.addAll(listNames);
+            mShoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String list = mShoppingListsAdapter.getItem(position);
+                    Intent intent = new Intent(getActivity(), ShoppingListActivity.class);
+                    intent.putExtra("householdID", householdID);
+                    for (JSONModels.HouseholdListJSON listJSON : finalHouseholdJSON.lists){
+                        if(listJSON.listName.equals(list)){
+                            intent.putExtra("listID", listJSON.listID);
+                        }
+                    }
+                    startActivity(intent);
+                }
+            });
         }
 
         public class GetHouseholdDataTask extends AsyncTask<Void, Void, Boolean>{

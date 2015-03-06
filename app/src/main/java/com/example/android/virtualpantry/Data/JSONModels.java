@@ -224,9 +224,9 @@ public class JSONModels {
     }
 
     public static class GetShoppingListResJSON{
-        private final long version;
-        private final String name;
-        private final List<Item> items;
+        public final long version;
+        public final String name;
+        public final List<Item> items;
 
         public GetShoppingListResJSON(long version, String name, List<Item> items){
             this.version = version;
@@ -235,11 +235,11 @@ public class JSONModels {
         }
 
         public static class Item{
-            private final String UPC;
-            private final String description;
-            private final int quantity;
-            private final int fractional;
-            private final String unitName;
+            public final String UPC;
+            public final String description;
+            public final int quantity;
+            public final int fractional;
+            public final String unitName;
 
             public Item(String UPC, String description, int quantity, int fractional, String unitName){
                 this.UPC = UPC;
