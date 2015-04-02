@@ -130,6 +130,17 @@ public class Request {
 
     //TODO: execute function
     public void execute(){
+        if(json != null){
+            send();
+        }
+        receive();
+        try {
+            responseCode = connection.getResponseCode();
+        } catch (IOException e){
+            Log.e(LOG_TAG, "Error getting response code", e);
+        } finally {
+            this.close();
+        }
         
     }
 
@@ -144,6 +155,7 @@ public class Request {
                 bufferedResponse.append(line);
                 bufferedResponse.append("\n");
             }
+            this.response = bufferedResponse.toString();
         } catch(IOException e){
             Log.e(LOG_TAG, "failed to read in receive()", e);
             connectionError = true;
