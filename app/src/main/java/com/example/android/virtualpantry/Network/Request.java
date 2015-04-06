@@ -149,7 +149,7 @@ public class Request {
         if(json != null){
             send();
         }
-        receive();
+            receive(true);
         try {
             responseCode = connection.getResponseCode();
         } catch (IOException e){
@@ -157,10 +157,23 @@ public class Request {
         } finally {
             this.close();
         }
-        
     }
 
-    private void receive(){
+    public void executeNoResponse(){
+        if(json != null){
+            send();
+        }
+        receive(false);
+        try {
+            responseCode = connection.getResponseCode();
+        } catch (IOException e){
+            Log.e(LOG_TAG, "Error getting response code", e);
+        } finally {
+            this.close();
+        }
+    }
+
+    private void receive(boolean logError){
         BufferedReader reader = null;
         try {
             InputStream inputStream = connection.getInputStream();
@@ -173,9 +186,11 @@ public class Request {
             }
             this.response = bufferedResponse.toString();
         } catch(IOException e){
-            Log.e(LOG_TAG, "failed to read in receive()", e);
+            if(logError) {Log.e(LOG_TAG, "failed to read in receive()", e);}
             connectionError = true;
-        } finally {
+            response = null;
+        }
+        finally {
             if(reader != null) {
                 try {
                     reader.close();

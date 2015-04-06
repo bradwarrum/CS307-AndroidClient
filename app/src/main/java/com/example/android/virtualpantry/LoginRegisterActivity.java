@@ -306,7 +306,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
             mStatusText.setText(R.string.LoginSuccess);
         }
 
-        private void registerSuccessful(String response){
+        private void registerSuccessful(){
             mStatusText.setVisibility(View.VISIBLE);
             mStatusText.setText(getString(R.string.RegisterSuccess));
         }
@@ -398,7 +398,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
             @Override
             protected Integer doInBackground(Void... params) {
                 if(request.openConnection()){
-                    request.execute();
+                    request.executeNoResponse();
                     return request.getResponseCode();
                 } else {
                     //request failed
@@ -413,7 +413,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
                 mLoginTask = null;
 
                 if(result == 201){
-                    registerSuccessful(request.getResponse());
+                    registerSuccessful();
                 } else {
                     Log.e(LOG_TAG, "Response code was: " + result);
                     Log.e(LOG_TAG, "Response was: " + request.getResponse());
