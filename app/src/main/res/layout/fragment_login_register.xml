@@ -41,15 +41,44 @@
         android:inputType="textPassword"
         android:maxLines="1"
         android:singleLine="true"/>
-    <EditText
-        android:id="@+id/LoginPasswordConfirm"
-        android:hint="@string/ConfirmPassword"
+    <LinearLayout
+        android:id="@+id/RegisterFields"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:visibility="gone"/>
+        android:orientation="vertical"
+        android:visibility="gone"
+        >
+        <EditText
+            android:id="@+id/LoginPasswordConfirm"
+            android:hint="@string/ConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:singleLine="true" />
+        <EditText
+            android:id="@+id/RegisterFirstName"
+            android:hint="@string/FirstNameHint"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:id="@+id/RegisterLastName"
+            android:hint="@string/LastNameHint"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/RegisterButton"
+            android:text="@string/RegisterButtonText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginTop="20sp"
+            />
+    </LinearLayout>
     <Button
         android:id="@+id/LoginButton"
         android:text="@string/LoginButtonText"
@@ -57,15 +86,6 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:layout_marginTop="20sp"
-        />
-    <Button
-        android:id="@+id/RegisterButton"
-        android:text="@string/RegisterButtonText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:layout_marginTop="20sp"
-        android:visibility="gone"
         />
     <Button
         android:id="@+id/LoginRegSwitchModeButton"

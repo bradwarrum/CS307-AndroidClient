@@ -127,6 +127,10 @@ public class Request {
         return connectionError;
     }
 
+    public String getSendJSON(){
+        return json;
+    }
+
     private void send(){
         try {
             DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());

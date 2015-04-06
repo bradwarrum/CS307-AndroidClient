@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Element text -->
     <string name="LoginPageHeader">Welcome to Virtual Pantry!</string>
     <string name="LoginHeader">Login</string>
-    <string name="RegiserHeader">Register</string>
+    <string name="RegisterHeader">Register</string>
     <string name="RegisterButtonText">Register</string>
     <string name="PromptEmail">Enter Email Address</string>
     <string name="PromptPassword">Enter Password</string>
@@ -10,6 +11,25 @@
     <string name="LoginButtonText">Login</string>
     <string name="LoginRegisterSwitchButtonText_Register">Switch to Register</string>
     <string name="LoginRegisterSwitchButtonText_Login">Switch to Login</string>
+
+    <!-- Message text -->
+    <string name="InvalidPasswordString">Password is not valid</string>
+    <string name="EmptyEmail">Email cannot be empty</string>
+    <string name="InvalidEmail">Email is not valid</string>
+    <string name="PasswordsDoNotMatch">Passwords do not match</string>
+    <string name="FirstNameHint">First Name</string>
+    <string name="LastNameHint">Last Name</string>
+    <string name="EmptyNameError">Name field cannot be empty</string>
+    <string name="AttemptLogin">Attempting to log in</string>
+    <string name="AttemptRegister">Attempting to register</string>
+    <string name="LoginRegRequestFailed">Error in network request</string>
+    <string name="MalformedInput">Malformed input error:</string>
+    <string name="EmailTaken">Email already taken</string>
+    <string name="LoginSuccess">Login Successful</string>
+    <string name="RegisterSuccess">Registration Successful</string>
+    <string name="UnknownRequestError">Unknown Request Error occurred:\n</string>
+
+
 
 
 </resources>
