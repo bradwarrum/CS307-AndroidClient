@@ -11,8 +11,8 @@ import java.security.NoSuchAlgorithmException;
  */
 public class NetworkUtility {
 
-    public static final String LOGIN_FILE_PATH = "users/login";
-    public static final String REGISTER_FILE_PATH = "users/register";
+    public static final String LOGIN_FILE_PATH = "/users/login";
+    public static final String REGISTER_FILE_PATH = "/users/register";
 
     public static String sha256(String text){
         MessageDigest digest = null;

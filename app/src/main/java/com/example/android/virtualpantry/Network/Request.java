@@ -21,8 +21,9 @@ public class Request {
     private static final String LOG_TAG = "Request_base";
 
     protected static final String protocol = "http";
-    private static final int port = 8000;
+    private static final int port = 80;
     private static final String host = "104.236.87.206";
+    private static final String file_base = "/api";
 
     public static final String GET = "GET";
     public static final String POST = "POST";
@@ -60,13 +61,13 @@ public class Request {
 
 
     public Request(String file, String connectionMethod){
-        this.file = file;
+        this.file = file_base + file;
         this.connectionMethod = connectionMethod;
         this.json = null;
     }
 
     public Request(String file, String connectionMethod, String json){
-        this.file = file;
+        this.file = file_base + file;
         this.connectionMethod = connectionMethod;
         this.json = json;
     }

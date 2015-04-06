@@ -129,13 +129,13 @@ public class LoginRegisterActivity extends ActionBarActivity {
                 //login mode to register
                 mLoginButton.setVisibility(View.GONE);
                 mRegisterFields.setVisibility(View.VISIBLE);
-                mSwitchButton.setText(R.string.LoginRegisterSwitchButtonText_Register);
+                mSwitchButton.setText(R.string.LoginRegisterSwitchButtonText_Login);
                 mHeader.setText(R.string.RegisterHeader);
             } else {
                 //register mode to login
                 mLoginButton.setVisibility(View.VISIBLE);
                 mRegisterFields.setVisibility(View.GONE);
-                mSwitchButton.setText(R.string.LoginRegisterSwitchButtonText_Login);
+                mSwitchButton.setText(R.string.LoginRegisterSwitchButtonText_Register);
                 mHeader.setText(R.string.LoginHeader);
             }
         }
@@ -376,7 +376,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
 
         public class RegisterTask extends AsyncTask<Void, Void, Integer> {
 
-            private static final String LOG_TAG = "LoginTask";
+            private static final String LOG_TAG = "RegisterTask";
             private final String mEmail;
             private final String mPassword;
             private final String mFirstName;
@@ -411,9 +411,12 @@ public class LoginRegisterActivity extends ActionBarActivity {
             @Override
             protected void onPostExecute(Integer result) {
                 mLoginTask = null;
+
                 if(result == 201){
                     registerSuccessful(request.getResponse());
                 } else {
+                    Log.e(LOG_TAG, "Response code was: " + result);
+                    Log.e(LOG_TAG, "Response was: " + request.getResponse());
                     int errorCode = JSONModels.gson.fromJson(request.getResponse(), JSONModels.ErrorResponseJSON.class).errorCode;
                     switch (errorCode) {
                         case Request.ERR_EMAIL_TAKEN:
