@@ -36,7 +36,7 @@ public class PantryDbHelper extends SQLiteOpenHelper{
                  HouseholdEntry._ID + " INTEGER PRIMARY KEY," +
                  HouseholdEntry.COLUMN_HOUSEHOLD_ID + " TEXT UNIQUE NOT NULL," +
                  HouseholdEntry.COLUMN_HOUSEHOLD_NAME + " TEXT NOT NULL," +
-                 HouseholdEntry.COLUMN_HOUSEHOLD_DESCRIPTION + " TEXT NOT NULL," +
+                 HouseholdEntry.COLUMN_HOUSEHOLD_DESCRIPTION + " TEXT NOT NULL" +
                 " );";
         final String SQL_CREATE_SHOPPING_LIST_ITEM_TABLE =
                 "CREATE TABLE " + ShoppingListItemEntry.TABLE_NAME + " (" +
@@ -46,7 +46,8 @@ public class PantryDbHelper extends SQLiteOpenHelper{
                 ShoppingListItemEntry.COLUMN_UPC + " TEXT NOT NULL, " +
                 ShoppingListItemEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL," +
                 ShoppingListItemEntry.COLUMN_QUANTITY + " TEXT NOT NULL," +
-                ShoppingListItemEntry.COLUMN_PACKAGE_NAME + " TEXT NOT NULL" +
+                ShoppingListItemEntry.COLUMN_PACKAGE_NAME + " TEXT NOT NULL," +
+                ShoppingListItemEntry.COLUMN_IN_CART + "TEXT NOT NULL" +
                 " );";
         final String SQL_CREATE_INVENTORY_ITEM_TABLE =
                 "CREATE TABLE " + InventoryEntry.TABLE_NAME + " (" +

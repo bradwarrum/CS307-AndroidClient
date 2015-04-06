@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="LoginPageHeader">Welcome to Virtual Pantry!</string>
+    <string name="LoginHeader">Login</string>
+    <string name="RegiserHeader">Register</string>
+    <string name="RegisterButtonText">Register</string>
+    <string name="PromptEmail">Enter Email Address</string>
+    <string name="PromptPassword">Enter Password</string>
+    <string name="ConfirmPassword">Confirm Password</string>
+    <string name="LoginButtonText">Login</string>
+    <string name="LoginRegisterSwitchButtonText_Register">Switch to Register</string>
+    <string name="LoginRegisterSwitchButtonText_Login">Switch to Login</string>
+
+
+</resources>

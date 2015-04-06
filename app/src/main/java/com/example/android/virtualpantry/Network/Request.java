@@ -2,6 +2,8 @@ package com.example.android.virtualpantry.Network;
 
 import android.util.Log;
 
+import com.example.android.virtualpantry.Data.JSONModels;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -10,7 +12,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.MalformedInputException;
 
 /**
  * Created by Garrett on 3/29/2015.
@@ -23,6 +24,12 @@ public class Request {
     private static final int port = 8000;
     private static final String host = "104.236.87.206";
 
+    public static final String GET = "GET";
+    public static final String POST = "POST";
+
+    //personal error
+    public static final int ERR_REQUEST_FAILED = 1;
+    //from server docs
     public static final int ERR_INTERNAL_ERROR = 3;
     public static final int ERR_TOKEN_EXPIRED = 4;
     public static final int ERR_INVALID_TOKEN = 5;
@@ -52,16 +59,20 @@ public class Request {
     private String response = null;
 
 
-    private Request(String file, String connectionMethod){
+    public Request(String file, String connectionMethod){
         this.file = file;
         this.connectionMethod = connectionMethod;
         this.json = null;
     }
 
-    private Request(String file, String connectionMethod, String json){
+    public Request(String file, String connectionMethod, String json){
         this.file = file;
         this.connectionMethod = connectionMethod;
         this.json = json;
+    }
+
+    public Request(String file, String connectionMethod, JSONModels.JSONModel json){
+        this(file, connectionMethod, json.toString());
     }
 
     public boolean openConnection(){
@@ -128,7 +139,7 @@ public class Request {
         }
     }
 
-    //TODO: execute function
+    //TODO: verify this is proper
     public void execute(){
         if(json != null){
             send();

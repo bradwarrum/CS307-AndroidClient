@@ -9,6 +9,13 @@ import android.provider.BaseColumns;
 //describes the database table setups
 public class VirtualPantryContract {
 
+    public static final String CONTENT_AUTHORITY = "com.example.android.virtualpantry.app";
+
+    public static final String PATH_LISTS = "lists";
+    public static final String PATH_HOUSEHOULDS = "households";
+    public static final String PATH_LIST_ITMES = "itmes";
+    public static final String PATH_INVENTORY_ITEMS = "inventory";
+
     public static final class ShoppingListEntry implements BaseColumns {
 
         public static final String TABLE_NAME = "shopping_lists";
@@ -44,6 +51,8 @@ public class VirtualPantryContract {
         public static final String COLUMN_QUANTITY = "quantity";
 
         public static final String COLUMN_PACKAGE_NAME = "package_name";
+
+        public static final String COLUMN_IN_CART = "in_cart";
     }
 
     public static final class InventoryEntry implements  BaseColumns {
