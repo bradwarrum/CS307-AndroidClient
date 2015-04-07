@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="HouseholdsTitle">Households</string>
+    <string name="CreateHouseholdButtonText">Create new household</string>
+    <string name="HouseholdsViewShoppingCartButtonText">View Shopping Cart</string>
+</resources>

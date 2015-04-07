@@ -26,6 +26,20 @@ public class JSONModels {
         }
     }
 
+    public static class LoginResJSON{
+        public final String firstName;
+        public final String lastName;
+        public final int userID;
+        public final String token;
+
+        LoginResJSON(String firstName, String lastName, int userID, String token){
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.userID = userID;
+            this.token = token;
+        }
+    }
+
     public static class RegisterReqJSON extends JSONModel{
         private final String emailAddress;
         private final String password;

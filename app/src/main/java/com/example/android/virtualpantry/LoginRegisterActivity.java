@@ -1,5 +1,7 @@
 package com.example.android.virtualpantry;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
@@ -18,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.virtualpantry.Data.JSONModels;
+import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
 
@@ -120,7 +123,27 @@ public class LoginRegisterActivity extends ActionBarActivity {
                     register();
                 }
             });
+
+            //see if user already has stored info:
+            SharedPreferences userInfo = getActivity().getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE);
+            if(hasUserInfo(userInfo)){
+                mEmail.setText(userInfo.getString(PreferencesHelper.USERNAME, ""));
+                mPrimaryPassword.setText(userInfo.getString(PreferencesHelper.PASSWORD, ""));
+                login();
+            }
             return rootView;
+        }
+
+        private boolean hasUserInfo(SharedPreferences userInfo){
+            if(!userInfo.contains(PreferencesHelper.USERNAME)
+                    || PreferencesHelper.isNull(userInfo.getString(PreferencesHelper.USERNAME, null))){
+                return false;
+            }
+            if(!userInfo.contains(PreferencesHelper.PASSWORD)
+                    || PreferencesHelper.isNull(userInfo.getString(PreferencesHelper.PASSWORD, null))){
+                return false;
+            }
+            return true;
         }
 
         private void switchModes(){
@@ -301,14 +324,29 @@ public class LoginRegisterActivity extends ActionBarActivity {
             focusView.requestFocus();
         }
 
-        private void loginSuccessful(String response){
+        private void loginSuccessful(String username, String password, String response){
             mStatusText.setVisibility(View.VISIBLE);
             mStatusText.setText(R.string.LoginSuccess);
+
+            //store the info
+            SharedPreferences user_info = getActivity().getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE);
+            SharedPreferences.Editor editor = user_info.edit();
+            editor.putString(PreferencesHelper.USERNAME, username);
+            editor.putString(PreferencesHelper.PASSWORD, password);
+            editor.putString(PreferencesHelper.TOKEN, JSONModels.gson.fromJson(response, JSONModels.LoginResJSON.class).token);
+            editor.commit();
+
+            //launch next page
+            Intent intent = new Intent(getActivity(), HouseholdsActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            getActivity().finish();
         }
 
         private void registerSuccessful(){
             mStatusText.setVisibility(View.VISIBLE);
             mStatusText.setText(getString(R.string.RegisterSuccess));
+            login();
         }
 
         private void unknownRequestError(int code, String response){
@@ -351,7 +389,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
             protected void onPostExecute(Integer result) {
                 mLoginTask = null;
                 if(result == 200){
-                    loginSuccessful(request.getResponse());
+                    loginSuccessful(mEmail, mPassword, request.getResponse());
                 } else {
                     int errorCode = JSONModels.gson.fromJson(request.getResponse(), JSONModels.ErrorResponseJSON.class).errorCode;
                     switch (errorCode) {
@@ -410,8 +448,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
 
             @Override
             protected void onPostExecute(Integer result) {
-                mLoginTask = null;
-
+                mRegisterTask = null;
                 if(result == 201){
                     registerSuccessful();
                 } else {

@@ -10,103 +10,112 @@
     android:orientation="vertical"
     tools:context=".LoginRegisterActivity$PlaceholderFragment">
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/LoginPageHeader"
-        android:gravity="center"
-        android:textSize="25sp"/>
-    <TextView android:text="@string/LoginHeader"
-        android:id="@+id/LoginRegHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="30sp"
-        android:layout_marginTop="20sp"
-        android:layout_marginBottom="20sp"
-        />
-    <AutoCompleteTextView
-        android:id="@+id/LoginRegEmail"
-        android:hint="@string/PromptEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:maxLines="1"
-        android:inputType="textEmailAddress"/>
-    <EditText
-        android:id="@+id/LoginPasswordMain"
-        android:hint="@string/PromptPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:maxLines="1"
-        android:singleLine="true"/>
-    <LinearLayout
-        android:id="@+id/RegisterFields"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        >
-        <EditText
-            android:id="@+id/LoginPasswordConfirm"
-            android:hint="@string/ConfirmPassword"
+        android:layout_height="match_parent">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:singleLine="true" />
-        <EditText
-            android:id="@+id/RegisterFirstName"
-            android:hint="@string/FirstNameHint"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:id="@+id/RegisterLastName"
-            android:hint="@string/LastNameHint"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <Button
-            android:id="@+id/RegisterButton"
-            android:text="@string/RegisterButtonText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:layout_marginTop="20sp"
-            />
-    </LinearLayout>
-    <Button
-        android:id="@+id/LoginButton"
-        android:text="@string/LoginButtonText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:layout_marginTop="20sp"
-        />
-    <Button
-        android:id="@+id/LoginRegSwitchModeButton"
-        android:layout_marginTop="20sp"
-        android:text="@string/LoginRegisterSwitchButtonText_Register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/LoginPageStatusText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hello"
-        android:gravity="center"
-        android:layout_marginTop="20sp"
-        android:textSize="20sp"
-        android:visibility="gone"/>
-    <ProgressBar android:id="@+id/login_progress" style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/LoginPageHeader"
+                android:gravity="center"
+                android:textSize="25sp"/>
+            <TextView android:text="@string/LoginHeader"
+                android:id="@+id/LoginRegHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="30sp"
+                android:layout_marginTop="20sp"
+                android:layout_marginBottom="20sp"
+                />
+            <AutoCompleteTextView
+                android:id="@+id/LoginRegEmail"
+                android:hint="@string/PromptEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:inputType="textEmailAddress"/>
+            <EditText
+                android:id="@+id/LoginPasswordMain"
+                android:hint="@string/PromptPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:singleLine="true"/>
+            <LinearLayout
+                android:id="@+id/RegisterFields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                >
+                <EditText
+                    android:id="@+id/LoginPasswordConfirm"
+                    android:hint="@string/ConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+                <EditText
+                    android:id="@+id/RegisterFirstName"
+                    android:hint="@string/FirstNameHint"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/RegisterLastName"
+                    android:hint="@string/LastNameHint"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <Button
+                    android:id="@+id/RegisterButton"
+                    android:text="@string/RegisterButtonText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:layout_marginTop="20sp"
+                    />
+            </LinearLayout>
+            <Button
+                android:id="@+id/LoginButton"
+                android:text="@string/LoginButtonText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_marginTop="20sp"
+                />
+            <Button
+                android:id="@+id/LoginRegSwitchModeButton"
+                android:layout_marginTop="20sp"
+                android:text="@string/LoginRegisterSwitchButtonText_Register"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/LoginPageStatusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hello"
+                android:gravity="center"
+                android:layout_marginTop="20sp"
+                android:textSize="20sp"
+                android:visibility="gone"/>
+            <ProgressBar android:id="@+id/login_progress" style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
 
 
 
