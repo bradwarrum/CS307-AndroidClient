@@ -1,7 +1,11 @@
 package com.example.android.virtualpantry.Data;
 
+import android.os.Parcelable;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.util.List;
 
 /**
  * Created by Garrett on 4/6/2015.
@@ -51,6 +55,39 @@ public class JSONModels {
             this.password = password;
             this.firstName = firstName;
             this.lastName = lastName;
+        }
+    }
+
+    public static class UserInfoResJSON {
+        public final long userID;
+        public final String firstName;
+        public final String lastName;
+        public final String emailAddress;
+        public final List<HouseholdShortJSON> households;
+
+        public UserInfoResJSON(
+                long userID,
+                String firstName,
+                String lastName,
+                String emailAddress,
+                List<HouseholdShortJSON> households) {
+            this.userID = userID;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.emailAddress = emailAddress;
+            this.households = households;
+        }
+    }
+
+    public static class HouseholdShortJSON{
+        public final long householdID;
+        public final String householdName;
+        public final String householdDescription;
+
+        public HouseholdShortJSON(long householdID, String householdName, String householdDescription) {
+            this.householdID = householdID;
+            this.householdName = householdName;
+            this.householdDescription = householdDescription;
         }
     }
 
