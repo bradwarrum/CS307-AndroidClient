@@ -10,4 +10,10 @@
     <string name="CreateHouseholdTitle">Create a household</string>
     <string name="CreateHouseholdNameHint">Household Name</string>
     <string name="CreateHouseholdDescriptionHint">Household Description</string>
+
+
+    <!-- individual household -->
+    <string name="HouseholdNameFiller">Household name</string>
+    <string name="HouseholdDescriptionFiller">Household description</string>
+    <string name="CreateNewListButtonText">Create new shopping list</string>
 </resources>

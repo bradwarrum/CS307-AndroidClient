@@ -102,7 +102,7 @@ public class HouseholdsActivity extends ActionBarActivity {
         for(HouseholdShortJSON household : userInfo.households){
             Map<String, String> householdMap = new HashMap<String, String>(2);
             householdMap.put("name", household.householdName);
-            householdMap.put("date", household.householdDescription);
+            householdMap.put("description", household.householdDescription);
             households.add(householdMap);
         }
         mHouseholdsAdapter = new SimpleAdapter(

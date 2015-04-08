@@ -30,6 +30,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.virtualpantry.HouseholdsActivity" />
         </activity>
+        <activity
+            android:name=".HouseholdActivity"
+            android:label="@string/title_activity_household"
+            android:parentActivityName=".HouseholdsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.android.virtualpantry.HouseholdsActivity" />
+        </activity>
     </application>
 
 </manifest>
