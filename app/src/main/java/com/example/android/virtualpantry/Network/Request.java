@@ -176,7 +176,13 @@ public class Request {
     private void receive(boolean logError){
         BufferedReader reader = null;
         try {
-            InputStream inputStream = connection.getInputStream();
+        	InputStream inputStream;
+        	//Fetch error stream if you don't get a successful response
+        	if (connection.getResponseCode() >= 400 || connection.getResponseCode() < 200) {
+        		inputStream = connection.getErrorStream();
+        	} else {
+        		inputStream = connection.getInputStream();
+        	}
             reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             StringBuffer bufferedResponse = new StringBuffer();
@@ -186,7 +192,7 @@ public class Request {
             }
             this.response = bufferedResponse.toString();
         } catch(IOException e){
-            if(logError) {Log.e(LOG_TAG, "failed to read in receive()", e);}
+            if(logError) { Log.e(LOG_TAG, "failed to read in receive()", e);}
             connectionError = true;
             response = null;
         }
