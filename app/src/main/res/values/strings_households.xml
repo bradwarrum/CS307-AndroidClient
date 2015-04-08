@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!--
+    Contains strings for all activities related to households
+    -->
     <string name="HouseholdsTitle">Households</string>
     <string name="CreateHouseholdButtonText">Create new household</string>
     <string name="HouseholdsViewShoppingCartButtonText">View Shopping Cart</string>
+
+    <string name="CreateHouseholdTitle">Create a household</string>
+    <string name="CreateHouseholdNameHint">Household Name</string>
+    <string name="CreateHouseholdDescriptionHint">Household Description</string>
 </resources>

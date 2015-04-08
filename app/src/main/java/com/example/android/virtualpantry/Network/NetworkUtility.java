@@ -21,7 +21,8 @@ public class NetworkUtility {
     public static final String REGISTER_FILE_PATH = "/users/register";
 
     //private paths
-    public static final String GET_USER_INFO_BASE_PATH = "/users/me?token=";
+    private static final String GET_USER_INFO_BASE_PATH = "/users/me?token=";
+    private static final String CREATE_HOUSEHOLD_BASE_PATH = "/households/create?token=";
 
     public static int loginSequence(Context context){
         Request request;
@@ -80,6 +81,10 @@ public class NetworkUtility {
 
     public static String createGetUserInfoString(String token){
         return GET_USER_INFO_BASE_PATH + token;
+    }
+
+    public static String createCreateHouseholdString(String token){
+        return CREATE_HOUSEHOLD_BASE_PATH + token;
     }
 
 

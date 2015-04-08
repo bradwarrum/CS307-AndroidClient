@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -53,6 +54,14 @@ public class HouseholdsActivity extends ActionBarActivity {
         mSubHeader = (TextView) findViewById(R.id.HouseholdsSubHeader);
         households = new ArrayList<Map<String, String>>();
 
+        mCreateHouseholdButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(HouseholdsActivity.this, CreateHouseholdActivity.class);
+                startActivity(intent);
+            }
+        });
+
         //send
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
@@ -63,7 +72,7 @@ public class HouseholdsActivity extends ActionBarActivity {
             finish();
         }
         GetUserInfoTask getUserInfoTask = new GetUserInfoTask(token);
-        getUserInfoTask.execute();
+        getUserInfoTask.execute((Void) null);
     }
 
     @Override
@@ -132,6 +141,7 @@ public class HouseholdsActivity extends ActionBarActivity {
                             request = new Request(
                                     NetworkUtility.createGetUserInfoString(mToken),
                                     Request.GET);
+                            return doInBackground((Void) null);
                         } else {
                             Log.e(LOG_TAG, "Token was null after re-login");
                             return -1;

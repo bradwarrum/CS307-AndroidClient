@@ -91,6 +91,16 @@ public class JSONModels {
         }
     }
 
+    public static class HouseholdCreateReqJSON extends JSONModel{
+        private final String householdName;
+        private final String householdDescription;
+
+        public HouseholdCreateReqJSON(String name, String description ) {
+            householdName = name;
+            householdDescription = description;
+        }
+    }
+
     public static class ErrorResponseJSON{
         public final int errorCode;
         public final String errorName;

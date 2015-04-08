@@ -22,6 +22,14 @@
             android:name=".HouseholdsActivity"
             android:label="@string/title_activity_households" >
         </activity>
+        <activity
+            android:name=".CreateHouseholdActivity"
+            android:label="@string/title_activity_create_household"
+            android:parentActivityName=".HouseholdsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.android.virtualpantry.HouseholdsActivity" />
+        </activity>
     </application>
 
 </manifest>
