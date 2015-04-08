@@ -101,6 +101,49 @@ public class JSONModels {
         }
     }
 
+    public static class HouseholdJSON{
+        public final long householdId;
+        public final String householdName;
+        public final String householdDescription;
+        public final String headOfHousehold;
+        public final List<HouseholdMemberJSON> members;
+        public final List<HouseholdListJSON> lists;
+
+        public HouseholdJSON(long householdId, String householdName, String householdDescription, String headOfHousehold,
+                             List<HouseholdMemberJSON> members, List<HouseholdListJSON> lists) {
+            this.householdId = householdId;
+            this.householdName = householdName;
+            this.householdDescription = householdDescription;
+            this.headOfHousehold = headOfHousehold;
+            this.members = members;
+            this.lists = lists;
+        }
+    }
+
+    public static class HouseholdMemberJSON{
+        public final String userID;
+        public final String firstName;
+        public final String lastName;
+        public final String emailAddress;
+
+        public HouseholdMemberJSON(String userID, String firstName, String lastName, String emailAddress){
+            this.userID = userID;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.emailAddress = emailAddress;
+        }
+    }
+
+    public static class HouseholdListJSON{
+        public final long listID;
+        public final String listName;
+
+        public HouseholdListJSON(long listID, String listName) {
+            this.listID = listID;
+            this.listName = listName;
+        }
+    }
+
     public static class ErrorResponseJSON{
         public final int errorCode;
         public final String errorName;

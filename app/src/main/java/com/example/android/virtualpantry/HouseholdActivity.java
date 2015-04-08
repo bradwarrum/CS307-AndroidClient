@@ -6,15 +6,27 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.example.android.virtualpantry.Data.JSONModels;
+import com.example.android.virtualpantry.Database.PreferencesHelper;
+import com.example.android.virtualpantry.Network.NetworkUtility;
+import com.example.android.virtualpantry.Network.Request;
+import com.example.android.virtualpantry.Data.JSONModels.HouseholdJSON;
+import com.example.android.virtualpantry.Data.JSONModels.HouseholdMemberJSON;
+import com.example.android.virtualpantry.Data.JSONModels.HouseholdListJSON;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class HouseholdActivity extends ActionBarActivity {
@@ -24,6 +36,10 @@ public class HouseholdActivity extends ActionBarActivity {
     private TextView mMembers;
     private Button mCreateListButton;
     private ListView mShoppingLists;
+    private HouseholdJSON mHouseholdJSON = null;
+
+    private SimpleAdapter mListAdapter;
+    private List<Map<String, String>> lists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +91,27 @@ public class HouseholdActivity extends ActionBarActivity {
         builder.show();
     }
 
+    //todo
     private void createNewList(String listName){
 
+    }
+
+    //todo:
+    private void updateDisplay(String response){
+        mHouseholdJSON = JSONModels.gson.fromJson(response, HouseholdJSON.class);
+        for(HouseholdListJSON list : mHouseholdJSON.lists){
+            Map<String, String> listEntry = new HashMap<>(2);
+            listEntry.put("list", list.listName);
+            listEntry.put("ID", new Long(list.listID).toString());
+            lists.add(listEntry);
+        }
+        mListAdapter = new SimpleAdapter(
+                this,
+                lists,
+                android.R.layout.simple_list_item_2,
+                new String[]{"list", "ID"},
+                new int[]{android.R.id.text1, android.R.id.text2});
+        mShoppingLists.setAdapter(mListAdapter);
     }
 
 
@@ -104,8 +139,10 @@ public class HouseholdActivity extends ActionBarActivity {
 
     private class GetHouseholdInfoTask extends AsyncTask<Void, Void, Integer>{
 
+        private static final String LOG_TAG = "GetHouseholdInfoTask";
         private final int mHouseholdID;
         private String mToken;
+        private Request request;
 
         public GetHouseholdInfoTask(int householdID, String token) {
             mHouseholdID = householdID;
@@ -114,12 +151,49 @@ public class HouseholdActivity extends ActionBarActivity {
 
         @Override
         protected Integer doInBackground(Void... params) {
-            return null;
+            request = new Request(
+                    NetworkUtility.createGetHouseholdString(mHouseholdID, mToken),
+                    Request.GET
+            );
+            if(request.openConnection()){
+                request.execute();
+                if(request.getResponseCode() == 403){
+                    //login again
+                    if(NetworkUtility.loginSequence(HouseholdActivity.this) == 1) {
+                        mToken = HouseholdActivity.this.getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null);
+                        if(mToken != null) {
+                            request = new Request(
+                                    NetworkUtility.createGetUserInfoString(mToken),
+                                    Request.GET);
+                            return doInBackground((Void) null);
+                        } else {
+                            Log.e(LOG_TAG, "Token was null after re-login");
+                            return -1;
+                        }
+                    } else {
+                        Log.e(LOG_TAG, "Unable to log in again");
+                        return -1;
+                    }
+                }
+            } else {
+                Log.e(LOG_TAG, "Unable to open connection");
+                return -1;
+            }
+            return request.getResponseCode();
         }
 
         @Override
-        protected void onPostExecute(Integer integer) {
-            super.onPostExecute(integer);
+        protected void onPostExecute(Integer result) {
+            switch(result){
+                case 200:
+                    updateDisplay(request.getResponse());
+                    break;
+                default:
+                    Log.e(LOG_TAG, "Failed to get household info: " +
+                            result + "\nResponse: " + request.getResponse());
+                    break;
+            }
+
         }
     }
 }
