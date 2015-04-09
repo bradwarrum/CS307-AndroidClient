@@ -277,13 +277,15 @@ public class LoginRegisterActivity extends ActionBarActivity {
         }
 
         private boolean isEmailValid(String email){
+            return true;
+            /*
             if(!email.contains("@"))
                 return false;
             if(email.charAt(0) == '@')
                 return false;
             if(email.charAt(email.length()-1) == '@')
                 return false;
-            return true;
+            return true;*/
         }
 
         private boolean isPasswordValid(String password){

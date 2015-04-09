@@ -136,6 +136,8 @@ public class Request {
         return file;
     }
 
+    public String getMessage() {return json;}
+
     private void send(){
         try {
             DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());

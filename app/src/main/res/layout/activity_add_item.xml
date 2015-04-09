@@ -47,6 +47,16 @@
         android:id="@+id/UserItemDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/ItemPackageName"
+        android:hint="@string/AddItemPackageNameHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/ItemPackageSize"
+        android:hint="@string/AddItemPackageSizeHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

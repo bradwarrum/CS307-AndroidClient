@@ -67,15 +67,7 @@ public class ShoppingListActivity extends ActionBarActivity {
         mAddItemButton = (Button) findViewById(R.id.AddItemButton);
         mShoppingList = (ListView) findViewById(R.id.ShoppingItemList);
 
-        mAddItemButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ShoppingListActivity.this, AddItemActivity.class);
-                intent.putExtra("householdID", mHouseholdID);
-                intent.putExtra("listID", mListID);
-                startActivity(intent);
-            }
-        });
+
 
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
@@ -113,7 +105,17 @@ public class ShoppingListActivity extends ActionBarActivity {
                 new int[]{android.R.id.text1, android.R.id.text2}
         );
         mShoppingList.setAdapter(mListDataAdapter);
-
+        mAddItemButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ShoppingListActivity.this, AddItemActivity.class);
+                intent.putExtra("householdID", mHouseholdID);
+                intent.putExtra("listID", mListID);
+                intent.putExtra("mode", AddItemActivity.LIST_MODE);
+                intent.putExtra("version", new Long(shoppingListJSON.version).longValue());
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -189,13 +191,20 @@ public class ShoppingListActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(Integer result) {
-            switch(result){
-                case 200:
-                    updateDisplay(request.getResponse());
-                default:
-                    Log.e(LOG_TAG, "Failed to get list info: " +
-                            result + "\nResponse: " + request.getResponse() + "\nAt: " + request.getFilePath());
-                    break;
+            //Log.d("LOG_TAG", "Response code is: " + request.getResponseCode() + " result is: " + result);
+            if(result != -1) {
+                switch (request.getResponseCode()) {
+                    case 200:
+                        updateDisplay(request.getResponse());
+                        break;
+                    default:
+                        Log.e(LOG_TAG, "Failed to get list info 1: " +
+                                request.getResponseCode() + "\nResponse: " + request.getResponse() + "\nAt: " + request.getFilePath());
+                        break;
+                }
+            } else{
+                Log.e(LOG_TAG, "Failed to get list info 2: " +
+                        request.getResponseCode() + "\nResponse: " + request.getResponse() + "\nAt: " + request.getFilePath());
             }
         }
     }

@@ -99,5 +99,17 @@ public class NetworkUtility {
         return "/households/" + householdID + "/lists/" + listID + "?token=" + token;
     }
 
+    public static String createLinkUPCString(long householdID, String UPC, String token){
+        return "/households/" + householdID + "/items/" + UPC + "/link?token=" + token;
+    }
+
+    public static String createLinkNoUPCString(long householdID, String token){
+        return "/households/" + householdID + "/items/generate?token=" + token;
+    }
+
+    public static String createUpdateShoppingListString(long householdID, long listID, String token){
+        return "/households/" + householdID + "/lists/" + listID + "/update?token=" +token;
+    }
+
 
 }

@@ -289,7 +289,7 @@ public class HouseholdActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(Integer result) {
             switch(result) {
-                case 200:
+                case 201:
                     new GetHouseholdInfoTask(mHouseholdID, mToken).execute((Void) null);
                     break;
                 default:

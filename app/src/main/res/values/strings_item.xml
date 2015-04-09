@@ -12,6 +12,8 @@
     <string name="AddItemFractionDefault">1</string>
     <string name="AddItemUnitHint">Units</string>
     <string name="AddItemAddItemButtonText">Add Item</string>
+    <string name="AddItemPackageNameHint">Package Name</string>
+    <string name="AddItemPackageSizeHint">Package Size</string>
 
 
 </resources>

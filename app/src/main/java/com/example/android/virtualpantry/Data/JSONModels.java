@@ -177,7 +177,50 @@ public class JSONModels {
         }
     }
 
-    public static class ErrorResponseJSON{
+    public static class LinkReqJSON extends JSONModel {
+        public final String description;
+        public final String packageName;
+        public final int packageUnits;
+        public final float packageSize;
+
+        public LinkReqJSON(String description, String packageName, int packageUnits, float packageSize) {
+            this.description = description;
+            this.packageName = packageName;
+            this.packageUnits = packageUnits;
+            this.packageSize = packageSize;
+        }
+    }
+
+    public static class CreateUPCResJSON{
+        public final String UPC;
+
+        public CreateUPCResJSON(String UPC){
+            this.UPC = UPC;
+        }
+    }
+
+    public static class UpdateListJSON extends JSONModel{
+        public final long version;
+        public final List<UpdateListItem> items;
+
+        public UpdateListJSON(long version, List<UpdateListItem> items){
+            this.version = version;
+            this.items = items;
+        }
+
+        public static class UpdateListItem{
+            public final String UPC;
+            public final int quantity;
+
+            public UpdateListItem(String UPC, int quantity){
+                this.UPC = UPC;
+                this.quantity = quantity;
+            }
+        }
+    }
+
+
+        public static class ErrorResponseJSON{
         public final int errorCode;
         public final String errorName;
         public final int httpStatus;
