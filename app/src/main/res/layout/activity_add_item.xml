@@ -1,0 +1,85 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="com.example.android.virtualpantry.AddItemToListActivity.AddItemToListFragment">
+
+    <TextView
+        android:text="@string/AddItemTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"/>
+    <Button
+        android:id="@+id/SwitchBarcodeModeButton"
+        android:text="@string/SwitchBarcodeModeButtonText_ToNoBarcode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10sp"
+        android:layout_marginTop="10sp"/>
+    <LinearLayout
+        android:id="@+id/AddItemBarcodeSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/BarcodeEditText"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:hint="@string/AddItemBarcodeHint"
+            />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ScanBarcodeButton"
+            android:text="@string/ScanBarcodeButtonText"
+            />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/ItemDescriptionText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+    <EditText
+        android:hint="@string/AddItemDescriptionHint"
+        android:id="@+id/UserItemDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/ItemUnitCount"
+            android:hint="@string/AddItemQuantityHint"
+            android:layout_width="100sp"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:text="/"
+            android:layout_width="10sp"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:id="@+id/ItemFraction"
+            android:hint="@string/AddItemFractionalHint"
+            android:text="@string/AddItemFractionDefault"
+            android:layout_width="100sp"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:id="@+id/ItemUnitType"
+            android:layout_width="150sp"
+            android:layout_height="wrap_content"
+            android:hint="@string/AddItemUnitHint"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/PushItemButton"
+        android:text="@string/AddItemAddItemButtonText"
+        android:layout_marginTop="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/AddItemStatusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

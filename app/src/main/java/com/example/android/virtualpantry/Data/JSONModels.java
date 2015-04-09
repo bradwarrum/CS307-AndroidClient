@@ -1,7 +1,5 @@
 package com.example.android.virtualpantry.Data;
 
-import android.os.Parcelable;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -141,6 +139,41 @@ public class JSONModels {
         public HouseholdListJSON(long listID, String listName) {
             this.listID = listID;
             this.listName = listName;
+        }
+    }
+
+    public static class ListCreateReqJSON extends JSONModel {
+        private final String listName;
+        public ListCreateReqJSON (String name) {
+            listName = name;
+        }
+    }
+
+    public static class GetShoppingListResJSON{
+        public final long version;
+        public final String name;
+        public final List<ItemJSON> items;
+
+        public GetShoppingListResJSON(long version, String name, List<ItemJSON> items){
+            this.version = version;
+            this.name = name;
+            this.items = items;
+        }
+
+        public static class ItemJSON {
+            public final String UPC;
+            public final String description;
+            public final int quantity;
+            public final int fractional;
+            public final String unitName;
+
+            public ItemJSON(String UPC, String description, int quantity, int fractional, String unitName){
+                this.UPC = UPC;
+                this.description = description;
+                this.quantity = quantity;
+                this.fractional = fractional;
+                this.unitName = unitName;
+            }
         }
     }
 

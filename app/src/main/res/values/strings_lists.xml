@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="ListNameFiller">List name</string>
+    <string name="VersionNumberFiller">Version number</string>
+    <string name="AddItemButtonText">Add Item</string>
+
+
+</resources>

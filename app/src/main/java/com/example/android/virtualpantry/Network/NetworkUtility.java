@@ -87,8 +87,16 @@ public class NetworkUtility {
         return CREATE_HOUSEHOLD_BASE_PATH + token;
     }
 
-    public static String createGetHouseholdString(int householdID, String token){
+    public static String createGetHouseholdString(long householdID, String token){
         return "/households/" + householdID + "?token=" + token;
+    }
+
+    public static String createCreateListString(long householdID, String token){
+        return "/households/" +householdID +  "/lists/create?token=" + token;
+    }
+
+    public static String createGetListString(long householdID, long listID, String token){
+        return "/households/" + householdID + "/lists/" + listID + "?token=" + token;
     }
 
 

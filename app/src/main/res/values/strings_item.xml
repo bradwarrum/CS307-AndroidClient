@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="AddItemTitle">Add new item to the list</string>
+    <string name="SwitchBarcodeModeButtonText_ToNoBarcode">Add item without barcode</string>
+    <string name="SwitchBarcodeModeButtonText_ToBarcode">Add item with barcode</string>
+    <string name="AddItemBarcodeHint">Barcode</string>
+    <string name="AddItemDescriptionHint">Description</string>
+    <string name="ScanBarcodeButtonText">Scan Barcode</string>
+    <string name="AddItemQuantityHint">Quantity</string>
+    <string name="AddItemFractionalHint">Fraction</string>
+    <string name="AddItemFractionDefault">1</string>
+    <string name="AddItemUnitHint">Units</string>
+    <string name="AddItemAddItemButtonText">Add Item</string>
+
+
+</resources>

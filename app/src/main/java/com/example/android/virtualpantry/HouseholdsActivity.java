@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -98,7 +99,7 @@ public class HouseholdsActivity extends ActionBarActivity {
     }
 
     private void updateDisplay(String response){
-        UserInfoResJSON userInfo = JSONModels.gson.fromJson(response, UserInfoResJSON.class);
+        final UserInfoResJSON userInfo = JSONModels.gson.fromJson(response, UserInfoResJSON.class);
         for(HouseholdShortJSON household : userInfo.households){
             Map<String, String> householdMap = new HashMap<String, String>(2);
             householdMap.put("name", household.householdName);
@@ -113,6 +114,15 @@ public class HouseholdsActivity extends ActionBarActivity {
                 new int[] {android.R.id.text1, android.R.id.text2});
         mHouseholdsList.setAdapter(mHouseholdsAdapter);
         mSubHeader.setText("" + userInfo.firstName + " " +userInfo.lastName + " households:");
+        mHouseholdsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                HouseholdShortJSON household = userInfo.households.get(position);
+                Intent intent = new Intent(HouseholdsActivity.this, HouseholdActivity.class);
+                intent.putExtra("householdID", household.householdID);
+                startActivity(intent);
+            }
+        });
     }
 
     public class GetUserInfoTask extends AsyncTask<Void, Void, Integer> {

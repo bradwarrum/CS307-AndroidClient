@@ -5,4 +5,6 @@
     <string name="title_activity_households">HouseholdsActivity</string>
     <string name="title_activity_create_household">CreateHouseholdActivity</string>
     <string name="title_activity_household">Household</string>
+    <string name="title_activity_shopping_list">ShoppingListActivity</string>
+    <string name="title_activity_add_item">AddItemActivity</string>
 </resources>

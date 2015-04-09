@@ -132,6 +132,10 @@ public class Request {
         return json;
     }
 
+    public String getFilePath(){
+        return file;
+    }
+
     private void send(){
         try {
             DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
