@@ -8,4 +8,5 @@
     <string name="title_activity_shopping_list">ShoppingListActivity</string>
     <string name="title_activity_add_item">AddItemActivity</string>
     <string name="title_activity_inventory">InventoryActivity</string>
+    <string name="title_activity_active_list">ActiveListActivity</string>
 </resources>

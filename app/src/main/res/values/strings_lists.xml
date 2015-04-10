@@ -5,5 +5,12 @@
     <string name="VersionNumberFiller">Version number</string>
     <string name="AddItemButtonText">Add Item</string>
 
+    <string name="CheckoutButtonText">Checkout</string>
+    <string name="ShoppingCartMode_List">Shopping List</string>
+    <string name="ShoppingCartMode_Cart">Shopping Cart</string>
+    <string name="ShoppingCartModeSwitchButton_ToCart">Switch to Cart</string>
+    <string name="ShoppingCartModeSwitchButton_ToList">Switch to List</string>
+    <!--<string name="ScanBarcodeButtonText">Scan Barcode</string>-->
+
 
 </resources>

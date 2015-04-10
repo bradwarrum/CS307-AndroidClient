@@ -23,8 +23,6 @@ import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
 import com.example.android.virtualpantry.Data.JSONModels.GetShoppingListResJSON;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +39,7 @@ public class ShoppingListActivity extends ActionBarActivity {
     private long mListID;
     private long mHouseholdID;
 
-    private GetShoppingListResJSON shoppingListJSON;
+    private GetShoppingListResJSON mShoppingListJSON;
 
     private List<Map<String, String>> mListData;
     private SimpleAdapter mListDataAdapter;
@@ -85,11 +83,11 @@ public class ShoppingListActivity extends ActionBarActivity {
     }
 
     private void updateDisplay(String response){
-        shoppingListJSON = JSONModels.gson.fromJson(response, GetShoppingListResJSON.class);
-        mHeader.setText(shoppingListJSON.name);
-        mVersion.setText(new Long(shoppingListJSON.version).toString());
+        mShoppingListJSON = JSONModels.gson.fromJson(response, GetShoppingListResJSON.class);
+        mHeader.setText(mShoppingListJSON.name);
+        mVersion.setText(new Long(mShoppingListJSON.version).toString());
         mListData = new ArrayList<Map<String, String>>();
-        for(GetShoppingListResJSON.ItemJSON item : shoppingListJSON.items){
+        for(GetShoppingListResJSON.ItemJSON item : mShoppingListJSON.items){
             Map<String, String> listItem = new HashMap<>(2);
             listItem.put("itemName", item.description);
             String subtitle = "";
@@ -117,7 +115,7 @@ public class ShoppingListActivity extends ActionBarActivity {
                 intent.putExtra("householdID", mHouseholdID);
                 intent.putExtra("listID", mListID);
                 intent.putExtra("mode", AddItemActivity.LIST_MODE);
-                intent.putExtra("version", new Long(shoppingListJSON.version).longValue());
+                intent.putExtra("version", new Long(mShoppingListJSON.version).longValue());
                 startActivity(intent);
             }
         });
@@ -127,7 +125,6 @@ public class ShoppingListActivity extends ActionBarActivity {
                 changeItemProperties(position);
             }
         });
-        Log.e(LOG_TAG, "listJSON: \n" + shoppingListJSON.toString());
     }
 
     private void changeItemProperties(final int position) {
@@ -149,8 +146,8 @@ public class ShoppingListActivity extends ActionBarActivity {
         cancelButton = (Button) dialog.findViewById(R.id.ListItemCancelButton);
 
         //setreactions
-        ((TextView) dialog.findViewById(R.id.ListItemDialogTitle)).setText(shoppingListJSON.items.get(position).description);
-        newQuantity.setText(String.valueOf(shoppingListJSON.items.get(position).quantity));
+        ((TextView) dialog.findViewById(R.id.ListItemDialogTitle)).setText(mShoppingListJSON.items.get(position).description);
+        newQuantity.setText(String.valueOf(mShoppingListJSON.items.get(position).quantity));
         removeItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -182,10 +179,10 @@ public class ShoppingListActivity extends ActionBarActivity {
             startActivity(intent);
             finish();
         }
-        new UpdateListQuantityTask(mHouseholdID, shoppingListJSON.version,
-                shoppingListJSON.items.get(position).UPC,
+        new UpdateListQuantityTask(mHouseholdID, mShoppingListJSON.version,
+                mShoppingListJSON.items.get(position).UPC,
                 0,
-                shoppingListJSON.items.get(position).fractional,
+                0,
                 token).execute((Void) null);
     }
 
@@ -198,10 +195,10 @@ public class ShoppingListActivity extends ActionBarActivity {
             startActivity(intent);
             finish();
         }
-        new UpdateListQuantityTask(mHouseholdID, shoppingListJSON.version,
-                shoppingListJSON.items.get(position).UPC,
+        new UpdateListQuantityTask(mHouseholdID, mShoppingListJSON.version,
+                mShoppingListJSON.items.get(position).UPC,
                 new Integer(quantity).intValue(),
-                shoppingListJSON.items.get(position).fractional,
+                mShoppingListJSON.items.get(position).fractional,
                 token).execute((Void) null);
     }
 
@@ -323,7 +320,6 @@ public class ShoppingListActivity extends ActionBarActivity {
                     updateJSON
             );
             if(request.openConnection()){
-                Log.e(LOG_TAG, "Sending:\n" + request.getSendJSON());
                 request.execute();
                 if(request.getResponseCode() == 403){
                     //login again

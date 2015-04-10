@@ -3,6 +3,7 @@ package com.example.android.virtualpantry;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -26,10 +27,14 @@ import com.example.android.virtualpantry.Data.JSONModels.HouseholdJSON;
 import com.example.android.virtualpantry.Data.JSONModels.HouseholdMemberJSON;
 import com.example.android.virtualpantry.Data.JSONModels.HouseholdListJSON;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class HouseholdActivity extends ActionBarActivity {
@@ -87,6 +92,19 @@ public class HouseholdActivity extends ActionBarActivity {
         }
         mHouseholdTask = new GetHouseholdInfoTask(mHouseholdID, token);
         mHouseholdTask.execute((Void) null);
+        ((Button) findViewById(R.id.GoToShoppingCartButton)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Set<Long> listIDs = new HashSet<Long>();
+                for(HouseholdListJSON list : mHouseholdJSON.lists){
+                    listIDs.add(list.listID);
+                }
+                if(listIDs.contains(getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getLong(PreferencesHelper.SHOPPING_CART_LIST_ID, -1))){
+                    Intent intent = new Intent(HouseholdActivity.this, ActiveListActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     private void createNewListDialog(){
@@ -116,7 +134,34 @@ public class HouseholdActivity extends ActionBarActivity {
         builder.show();
     }
 
-    //todo
+    private void confirmNewActiveList(final int position){
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setTitle("Make new active shopping list");
+        final TextView msg = new TextView(this);
+        msg.setText("By making this list the active shopping list you will overwrite the current active shopping list");
+        alertBuilder.setView(msg);
+
+        alertBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SharedPreferences.Editor editor = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).edit();
+                editor.putString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, " ");
+                editor.putLong(PreferencesHelper.SHOPPING_CART_HOUSEHOLD_ID, mHouseholdID);
+                editor.putLong(PreferencesHelper.SHOPPING_CART_LIST_ID, mHouseholdJSON.lists.get(position).listID);
+                editor.commit();
+                Intent intent = new Intent(HouseholdActivity.this, ActiveListActivity.class);
+                startActivity(intent);
+            }
+        });
+        alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        alertBuilder.show();
+    }
+
     private void createNewList(String listName){
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
@@ -129,7 +174,6 @@ public class HouseholdActivity extends ActionBarActivity {
         new CreateListTask(listName, token).execute((Void) null);
     }
 
-    //todo:
     private void updateDisplay(String response){
         mHouseholdJSON = JSONModels.gson.fromJson(response, HouseholdJSON.class);
         mHeader.setText(mHouseholdJSON.householdName);
@@ -165,6 +209,13 @@ public class HouseholdActivity extends ActionBarActivity {
                 intent.putExtra("householdID", mHouseholdID);
                 intent.putExtra("householdName", mHouseholdJSON.householdName);
                 startActivity(intent);
+            }
+        });
+        mShoppingLists.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                confirmNewActiveList(position);
+                return true;
             }
         });
     }
