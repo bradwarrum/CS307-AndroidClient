@@ -231,10 +231,12 @@ public class JSONModels {
         public static class UpdateListItem{
             public final String UPC;
             public final int quantity;
+            public final int fractional;
 
-            public UpdateListItem(String UPC, int quantity){
+            public UpdateListItem(String UPC, int quantity, int fractional){
                 this.UPC = UPC;
                 this.quantity = quantity;
+                this.fractional = fractional;
             }
         }
     }

@@ -286,7 +286,7 @@ public class ShoppingListActivity extends ActionBarActivity {
         }
     }
 
-    public class UpdateListQuantityTask extends AsyncTask<Void, Void, Integer>{
+    private class UpdateListQuantityTask extends AsyncTask<Void, Void, Integer>{
 
         private static final String LOG_TAG = "UpdateListQtyTask";
         private final long mVersion;

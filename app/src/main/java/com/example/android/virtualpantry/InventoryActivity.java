@@ -13,10 +13,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +43,7 @@ public class InventoryActivity extends ActionBarActivity {
     private long mHouseholdID;
 
     private GetInventoryResJSON mInventoryJSON;
+    private JSONModels.HouseholdJSON mHouseholdJSON;
 
     private String householdName;
 
@@ -84,6 +87,7 @@ public class InventoryActivity extends ActionBarActivity {
         new GetInventoryTask(mHouseholdID, token).execute((Void) null);
         //Toast toast = Toast.makeText(this.getApplicationContext(), "Fetching Inventory", Toast.LENGTH_SHORT);
         //toast.show();
+        new GetHouseholdInfoTask(mHouseholdID, token).execute((Void) null);
     }
 
     private void updateDisplay(String response){
@@ -167,7 +171,7 @@ public class InventoryActivity extends ActionBarActivity {
         addToListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveItem(position);
+                moveItem(mInventoryJSON.items.get(position).UPC, Integer.valueOf(newQuantity.getText().toString()));
                 dialog.cancel();
             }
         });
@@ -219,8 +223,45 @@ public class InventoryActivity extends ActionBarActivity {
                 token).execute((Void) null);
     }
 
-    private void moveItem(int position){
+    private void moveItem(final String UPC, final int quantity){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Move Item to Shopping list");
+        final Spinner spinner = new Spinner(this);
+        List<String> lists = new ArrayList<String>();
+        for(JSONModels.HouseholdListJSON list : mHouseholdJSON.lists){
+            lists.add(list.listName);
+        }
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_spinner_item, lists);
+        spinner.setAdapter(spinnerAdapter);
+        builder.setView(spinner);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                moveItemToList(UPC, quantity, mHouseholdJSON.lists.get(spinner.getSelectedItemPosition()).listID);
+                dialog.cancel();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
 
+    private void moveItemToList(String UPC, int quantity, long listID){
+        String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
+                .getString(PreferencesHelper.TOKEN, null);
+        if(token == null){
+            Intent intent = new Intent(this, LoginRegisterActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        }
+        new GetListTask(mHouseholdID, listID, UPC, quantity, token).execute((Void) null);
     }
 
 
@@ -306,7 +347,7 @@ public class InventoryActivity extends ActionBarActivity {
     }
 
 
-    public class UpdateInventoryQuantityTask extends AsyncTask<Void, Void, Integer>{
+    private class UpdateInventoryQuantityTask extends AsyncTask<Void, Void, Integer>{
 
         private static final String LOG_TAG = "UpdateInvQtyTask";
         private final long mVersion;
@@ -375,6 +416,209 @@ public class InventoryActivity extends ActionBarActivity {
                 default:
                     Log.e(LOG_TAG, "Failed to update inventory info: " +
                             result + "\nResponse: " + request.getResponse() + "\nAt: " + request.getFilePath());
+                    break;
+            }
+        }
+    }
+
+    private class GetHouseholdInfoTask extends AsyncTask<Void, Void, Integer>{
+
+        private static final String LOG_TAG = "GetHouseholdInfoTask";
+        private final long mHouseholdID;
+        private String mToken;
+        private Request request;
+
+        public GetHouseholdInfoTask(long householdID, String token) {
+            mHouseholdID = householdID;
+            mToken = token;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            request = new Request(
+                    NetworkUtility.createGetHouseholdString(mHouseholdID, mToken),
+                    Request.GET
+            );
+            if(request.openConnection()){
+                request.execute();
+                if(request.getResponseCode() == 403){
+                    //login again
+                    if(NetworkUtility.loginSequence(InventoryActivity.this) == 1) {
+                        mToken = InventoryActivity.this.getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null);
+                        if(mToken != null) {
+                            request = new Request(
+                                    NetworkUtility.createGetUserInfoString(mToken),
+                                    Request.GET);
+                            return doInBackground((Void) null);
+                        } else {
+                            Log.e(LOG_TAG, "Token was null after re-login");
+                            return -1;
+                        }
+                    } else {
+                        Log.e(LOG_TAG, "Unable to log in again");
+                        return -1;
+                    }
+                }
+            } else {
+                Log.e(LOG_TAG, "Unable to open connection");
+                return -1;
+            }
+            return request.getResponseCode();
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            switch(result){
+                case 200:
+                    mHouseholdJSON = JSONModels.gson.fromJson(request.getResponse(), JSONModels.HouseholdJSON.class);
+                    break;
+                default:
+                    Log.e(LOG_TAG, "Failed to get household info: " +
+                            result + "\nResponse: " + request.getResponse() + "\nAt: " + request.getFilePath());
+                    break;
+            }
+
+        }
+    }
+
+    private class GetListTask extends AsyncTask<Void, Void, Integer> {
+
+        private static final String LOG_TAG = "GetListTask";
+        private final long mHouseholdID;
+        private final long mListID;
+        private String mToken;
+        private Request request;
+        private final String mUPC;
+        private final int mQuantity;
+
+        public GetListTask(long householdID, long listID, String upc, int quantity, String token) {
+            mHouseholdID = householdID;
+            mListID = listID;
+            mToken = token;
+            mUPC = upc;
+            mQuantity = quantity;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            request = new Request(
+                    NetworkUtility.createGetListString(mHouseholdID, mListID, mToken),
+                    Request.GET
+            );
+            if(request.openConnection()){
+                request.execute();
+                if(request.getResponseCode() == 403){
+                    //login again
+                    if(NetworkUtility.loginSequence(InventoryActivity.this) == 1) {
+                        mToken = InventoryActivity.this.getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null);
+                        if(mToken != null) {
+                            request = new Request(
+                                    NetworkUtility.createGetUserInfoString(mToken),
+                                    Request.GET);
+                            return doInBackground((Void) null);
+                        } else {
+                            Log.e(LOG_TAG, "Token was null after re-login");
+                            return -1;
+                        }
+                    } else {
+                        Log.e(LOG_TAG, "Unable to log in again");
+                        return -1;
+                    }
+                }
+            } else {
+                Log.e(LOG_TAG, "Unable to open connection");
+                return -1;
+            }
+            return request.getResponseCode();
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            switch (result) {
+                case 200:
+                    long version = JSONModels.gson.fromJson(request.getResponse(), JSONModels.GetShoppingListResJSON.class).version;
+                    new UpdateListQuantityTask(mHouseholdID, mListID, version, mUPC, mQuantity, 0, mToken).execute((Void) null);
+                    break;
+                default:
+                    Log.e(LOG_TAG, "Failed to get list info 1: " +
+                            request.getResponseCode() + "\nResponse: " + request.getResponse() + "\nAt: " + request.getFilePath());
+                    break;
+            }
+        }
+    }
+
+    private class UpdateListQuantityTask extends AsyncTask<Void, Void, Integer>{
+
+        private static final String LOG_TAG = "UpdateListQtyTask";
+        private final long mVersion;
+        private String mToken;
+        private final long mHouseholdID;
+        private final String mUPC;
+        private final int mQuantity;
+        private final int mFractional;
+        private final long mListID;
+
+        private Request request;
+
+
+        public UpdateListQuantityTask(long householdID, long listID, long version, String UPC, int quantity, int fractional, String token){
+            mVersion = version;
+            mHouseholdID = householdID;
+            mUPC = UPC;
+            mQuantity = quantity;
+            mFractional = fractional;
+            mToken = token;
+            mListID = listID;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            //INVENTORY MODE
+            List<JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem> items = new ArrayList<>();
+            items.add(new JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem(mUPC, mQuantity, mFractional));
+            JSONModels.UpdateInventoryReqJSON updateJSON = new JSONModels.UpdateInventoryReqJSON(mVersion, items);
+            request = new Request(
+                    NetworkUtility.createUpdateShoppingListString(mHouseholdID, mListID, mToken),
+                    Request.POST,
+                    updateJSON
+            );
+            if(request.openConnection()){
+                request.execute();
+                if(request.getResponseCode() == 403){
+                    //login again
+                    if(NetworkUtility.loginSequence(InventoryActivity.this) == 1) {
+                        mToken = InventoryActivity.this.getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null);
+                        if(mToken != null) {
+                            request = new Request(
+                                    NetworkUtility.createGetUserInfoString(mToken),
+                                    Request.GET);
+                            return doInBackground((Void) null);
+                        } else {
+                            Log.e(LOG_TAG, "Token was null after re-login");
+                            return -1;
+                        }
+                    } else {
+                        Log.e(LOG_TAG, "Unable to log in again");
+                        return -1;
+                    }
+                }
+            } else {
+                Log.e(LOG_TAG, "Unable to open connection");
+                return -1;
+            }
+            return request.getResponseCode();
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            switch(result){
+                case 200:
+                    //todo:
+                    break;
+                default:
+                    Log.e(LOG_TAG, "Failed to update inventory info: " +
+                            result + "\nResponse: " + request.getResponse() + "\nAt: " + request.getFilePath());
+                    Log.e(LOG_TAG, "Sent:\n" + request.getSendJSON());
                     break;
             }
         }

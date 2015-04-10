@@ -379,7 +379,7 @@ public class AddItemActivity extends ActionBarActivity {
                     }
                     if(mMode == LIST_MODE) {
                         List<JSONModels.UpdateListJSON.UpdateListItem> items = new ArrayList<>();
-                        items.add(new JSONModels.UpdateListJSON.UpdateListItem(mUPC, mQuantity));
+                        items.add(new JSONModels.UpdateListJSON.UpdateListItem(mUPC, mQuantity, mFraction));
                         JSONModels.UpdateListJSON updateListJSON = new JSONModels.UpdateListJSON(mVersionNo, items);
                         request = new Request(
                                 NetworkUtility.createUpdateShoppingListString(mHouseholdID, mListID, mToken),
