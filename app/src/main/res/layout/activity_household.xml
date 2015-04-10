@@ -31,6 +31,13 @@
         android:visibility="gone"
         />
     <Button
+        android:id="@+id/ViewInventoryButton"
+        android:text="@string/ViewInventoryButtonText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_marginBottom="10sp"/>
+    <Button
         android:id="@+id/CreateNewShoppingListButton"
         android:text="@string/CreateNewListButtonText"
         android:layout_width="match_parent"

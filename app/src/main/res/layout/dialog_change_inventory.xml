@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/InventoryItemDialogTitle"
+        android:text="Item"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10sp"/>
+    <TextView
+        android:text="@string/InventoryDialogChangeQuantityText"
+        android:textSize="25sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+    <EditText
+        android:id="@+id/ChangeQuantityInput"
+        android:layout_marginTop="5sp"
+        android:inputType="number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:text="Update"
+            android:id="@+id/InventoryItemUpdateButton"
+            android:layout_width="wrap_content"
+            android:width="192sp"
+            android:layout_height="wrap_content" />
+        <Button
+            android:text="Cancel"
+            android:id="@+id/InventoryItemCancelButton"
+            android:width="192sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    <Button
+        android:id="@+id/InventoryToListButton"
+        android:layout_marginTop="20sp"
+        android:text="@string/InventoryDialogAddItemToListButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/InventoryRemoveItemButton"
+        android:layout_marginTop="5sp"
+        android:text="@string/InventoryDialogRemoveItemButtonText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

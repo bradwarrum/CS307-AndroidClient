@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="HouseholdInventoryTitleFiller">Inventory</string>
+    <string name="HouseholdInventoryVersionFiller">Version</string>
+
+    <!--dialog-->
+    <string name="InventoryDialogChangeQuantityText">Change quantity:</string>
+    <string name="InventoryDialogRemoveItemButtonText">Remove Item</string>
+    <string name="InventoryDialogAddItemToListButton">Add Item to List</string>
+</resources>

@@ -111,5 +111,13 @@ public class NetworkUtility {
         return "/households/" + householdID + "/lists/" + listID + "/update?token=" +token;
     }
 
+    public static  String createGetInventoryString(long householdID, String token){
+        return "/households/" + householdID + "/items?token=" + token;
+    }
+
+    public static String createUpdateInventoryString(long householdID, String token){
+        return "/households/" + householdID + "/items/update?token=" + token;
+    }
+
 
 }

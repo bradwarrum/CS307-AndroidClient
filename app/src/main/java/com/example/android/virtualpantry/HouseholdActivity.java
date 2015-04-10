@@ -43,6 +43,7 @@ public class HouseholdActivity extends ActionBarActivity {
     private HouseholdJSON mHouseholdJSON = null;
     private GetHouseholdInfoTask mHouseholdTask = null;
     private long mHouseholdID;
+    private Button mViewInventorybutton;
 
     private SimpleAdapter mListAdapter;
     private List<Map<String, String>> lists;
@@ -67,6 +68,7 @@ public class HouseholdActivity extends ActionBarActivity {
         mMembers = (TextView) findViewById(R.id.HouseholdMembers);
         mCreateListButton = (Button) findViewById(R.id.CreateNewShoppingListButton);
         mShoppingLists = (ListView) findViewById(R.id.ListviewHousehold);
+        mViewInventorybutton = (Button) findViewById(R.id.ViewInventoryButton);
 
         mCreateListButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +155,15 @@ public class HouseholdActivity extends ActionBarActivity {
                 Intent intent = new Intent(HouseholdActivity.this, ShoppingListActivity.class);
                 intent.putExtra("householdID", mHouseholdID);
                 intent.putExtra("listID", list.listID);
+                startActivity(intent);
+            }
+        });
+        mViewInventorybutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HouseholdActivity.this, InventoryActivity.class);
+                intent.putExtra("householdID", mHouseholdID);
+                intent.putExtra("householdName", mHouseholdJSON.householdName);
                 startActivity(intent);
             }
         });

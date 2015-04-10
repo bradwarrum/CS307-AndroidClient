@@ -1,5 +1,7 @@
 package com.example.android.virtualpantry.Data;
 
+import android.app.LauncherActivity;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -149,7 +151,7 @@ public class JSONModels {
         }
     }
 
-    public static class GetShoppingListResJSON{
+    public static class GetShoppingListResJSON extends JSONModel{
         public final long version;
         public final String name;
         public final List<ItemJSON> items;
@@ -165,14 +167,32 @@ public class JSONModels {
             public final String description;
             public final int quantity;
             public final int fractional;
-            public final String unitName;
+            public final ListItemPackagingJSON packaging;
 
-            public ItemJSON(String UPC, String description, int quantity, int fractional, String unitName){
+            public ItemJSON(String UPC, String description, int quantity, int fractional, String unitName, ListItemPackagingJSON packaging){
                 this.UPC = UPC;
                 this.description = description;
                 this.quantity = quantity;
                 this.fractional = fractional;
-                this.unitName = unitName;
+                this.packaging = packaging;
+            }
+
+            public static class ListItemPackagingJSON {
+                public final float packageSize;
+                public final int unitID;
+                public final String unitName;
+                public final String unitAbbreviation;
+                public final String packageName;
+
+                public ListItemPackagingJSON(float packageSize, int unitID,
+                                                  String unitName, String unitAbbreviation,
+                                                  String packageName){
+                    this.packageSize = packageSize;
+                    this.unitID = unitID;
+                    this.unitName = unitName;
+                    this.unitAbbreviation = unitAbbreviation;
+                    this.packageName = packageName;
+                }
             }
         }
     }
@@ -219,8 +239,77 @@ public class JSONModels {
         }
     }
 
+    public static class GetInventoryResJSON{
+        public final long version;
+        public final List<InventoryItemJSON> items;
 
-        public static class ErrorResponseJSON{
+        public GetInventoryResJSON(long version, List<InventoryItemJSON> items){
+            this.version = version;
+            this.items = items;
+        }
+
+        public static class InventoryItemJSON extends JSONModel{
+            public final String UPC;
+            public final boolean isInternalUPC;
+            public final String description;
+            public final int quantity;
+            public final int fractional;
+            public final InventoryItemPackagingJSON packaging;
+
+            public InventoryItemJSON(String UPC, boolean isInternalUPC,
+                                     String description, int quantity,
+                                     int fractional, InventoryItemPackagingJSON packaging){
+                this.UPC = UPC;
+                this.isInternalUPC = isInternalUPC;
+                this.description = description;
+                this.quantity = quantity;
+                this.fractional = fractional;
+                this.packaging = packaging;
+            }
+
+            public static class InventoryItemPackagingJSON {
+                public final float packageSize;
+                public final int unitID;
+                public final String unitName;
+                public final String unitAbbreviation;
+                public final String packageName;
+
+                public InventoryItemPackagingJSON(float packageSize, int unitID,
+                                                  String unitName, String unitAbbreviation,
+                                                  String packageName){
+                    this.packageSize = packageSize;
+                    this.unitID = unitID;
+                    this.unitName = unitName;
+                    this.unitAbbreviation = unitAbbreviation;
+                    this.packageName = packageName;
+                }
+            }
+        }
+    }
+
+    public static class UpdateInventoryReqJSON extends JSONModel{
+        public final long version;
+        public final List<UpdateInventoryItem> items;
+
+        public UpdateInventoryReqJSON(long version, List<UpdateInventoryItem> items){
+            this.version = version;
+            this.items = items;
+        }
+
+        public static class UpdateInventoryItem{
+            public final String UPC;
+            public final int quantity;
+            public final int fractional;
+
+            public UpdateInventoryItem(String UPC, int quantity, int fractional){
+                this.UPC = UPC;
+                this.quantity = quantity;
+                this.fractional = fractional;
+            }
+        }
+    }
+
+    public static class ErrorResponseJSON{
         public final int errorCode;
         public final String errorName;
         public final int httpStatus;

@@ -54,6 +54,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.virtualpantry.ShoppingListActivity" />
         </activity>
+        <activity
+            android:name=".InventoryActivity"
+            android:label="@string/title_activity_inventory"
+            android:parentActivityName=".HouseholdActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.android.virtualpantry.HouseholdActivity" />
+        </activity>
     </application>
 
 </manifest>

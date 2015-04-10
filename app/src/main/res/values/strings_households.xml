@@ -16,4 +16,5 @@
     <string name="HouseholdNameFiller">Household name</string>
     <string name="HouseholdDescriptionFiller">Household description</string>
     <string name="CreateNewListButtonText">Create new shopping list</string>
+    <string name="ViewInventoryButtonText">View Household Inventory</string>
 </resources>
