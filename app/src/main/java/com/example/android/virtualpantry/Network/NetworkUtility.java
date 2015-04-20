@@ -35,7 +35,7 @@ public class NetworkUtility {
             request = new Request(
                     NetworkUtility.LOGIN_FILE_PATH,
                     Request.POST,
-                    new JSONModels.LoginReqJSON(email, password));
+                    new JSONModels.LoginRequest(email, password));
             if(request.openConnection()){
                 request.execute();
             } else {
@@ -44,8 +44,8 @@ public class NetworkUtility {
             }
             if(request.getResponseCode() != 200) {
                 if(request.getResponse() != null) {
-                    JSONModels.LoginResJSON loginRes =
-                            JSONModels.gson.fromJson(request.getResponse(), JSONModels.LoginResJSON.class);
+                    JSONModels.LoginResponse loginRes =
+                            JSONModels.gson.fromJson(request.getResponse(), JSONModels.LoginResponse.class);
                     SharedPreferences user_info =
                             context.getSharedPreferences(PreferencesHelper.USER_INFO, context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = user_info.edit();

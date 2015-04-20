@@ -1,7 +1,5 @@
 package com.example.android.virtualpantry.Data;
 
-import android.app.LauncherActivity;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -11,32 +9,33 @@ import java.util.List;
  * Created by Garrett on 4/6/2015.
  */
 public class JSONModels {
+
     public static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+    //base class to allow class to be exported to String
     public static class JSONModel {
         public String toString(){
             return gson.toJson(this);
         }
-
     }
 
-    public static class LoginReqJSON extends JSONModel{
+    public static class LoginRequest extends JSONModel{
         private final String emailAddress;
         private final String password;
 
-        public LoginReqJSON(String emailAddress, String password) {
+        public LoginRequest(String emailAddress, String password) {
             this.emailAddress = emailAddress;
             this.password = password;
         }
     }
 
-    public static class LoginResJSON{
+    public static class LoginResponse {
         public final String firstName;
         public final String lastName;
         public final int userID;
         public final String token;
 
-        LoginResJSON(String firstName, String lastName, int userID, String token){
+        LoginResponse(String firstName, String lastName, int userID, String token){
             this.firstName = firstName;
             this.lastName = lastName;
             this.userID = userID;
@@ -44,13 +43,13 @@ public class JSONModels {
         }
     }
 
-    public static class RegisterReqJSON extends JSONModel{
+    public static class RegisterRequest extends JSONModel{
         private final String emailAddress;
         private final String password;
         private final String firstName;
         private final String lastName;
 
-        public RegisterReqJSON(String emailAddress, String password, String firstName, String lastName) {
+        public RegisterRequest(String emailAddress, String password, String firstName, String lastName) {
             this.emailAddress = emailAddress;
             this.password = password;
             this.firstName = firstName;
@@ -58,59 +57,59 @@ public class JSONModels {
         }
     }
 
-    public static class UserInfoResJSON {
+    public static class UserInfoResponse {
         public final long userID;
         public final String firstName;
         public final String lastName;
         public final String emailAddress;
-        public final List<HouseholdShortJSON> households;
+        public final List<Household> households;
 
-        public UserInfoResJSON(
+        public UserInfoResponse(
                 long userID,
                 String firstName,
                 String lastName,
                 String emailAddress,
-                List<HouseholdShortJSON> households) {
+                List<Household> households) {
             this.userID = userID;
             this.firstName = firstName;
             this.lastName = lastName;
             this.emailAddress = emailAddress;
             this.households = households;
         }
-    }
 
-    public static class HouseholdShortJSON{
-        public final long householdID;
-        public final String householdName;
-        public final String householdDescription;
+        public static class Household {
+            public final long householdID;
+            public final String householdName;
+            public final String householdDescription;
 
-        public HouseholdShortJSON(long householdID, String householdName, String householdDescription) {
-            this.householdID = householdID;
-            this.householdName = householdName;
-            this.householdDescription = householdDescription;
+            public Household(long householdID, String householdName, String householdDescription) {
+                this.householdID = householdID;
+                this.householdName = householdName;
+                this.householdDescription = householdDescription;
+            }
         }
     }
 
-    public static class HouseholdCreateReqJSON extends JSONModel{
+    public static class HouseholdCreateRequest extends JSONModel{
         private final String householdName;
         private final String householdDescription;
 
-        public HouseholdCreateReqJSON(String name, String description ) {
+        public HouseholdCreateRequest(String name, String description) {
             householdName = name;
             householdDescription = description;
         }
     }
 
-    public static class HouseholdJSON{
+    public static class Household {
         public final long householdId;
         public final String householdName;
         public final String householdDescription;
         public final String headOfHousehold;
-        public final List<HouseholdMemberJSON> members;
-        public final List<HouseholdListJSON> lists;
+        public final List<HouseholdMember> members;
+        public final List<HouseholdList> lists;
 
-        public HouseholdJSON(long householdId, String householdName, String householdDescription, String headOfHousehold,
-                             List<HouseholdMemberJSON> members, List<HouseholdListJSON> lists) {
+        public Household(long householdId, String householdName, String householdDescription, String headOfHousehold,
+                         List<HouseholdMember> members, List<HouseholdList> lists) {
             this.householdId = householdId;
             this.householdName = householdName;
             this.householdDescription = householdDescription;
@@ -118,58 +117,58 @@ public class JSONModels {
             this.members = members;
             this.lists = lists;
         }
-    }
 
-    public static class HouseholdMemberJSON{
-        public final String userID;
-        public final String firstName;
-        public final String lastName;
-        public final String emailAddress;
+        public static class HouseholdMember {
+            public final String userID;
+            public final String firstName;
+            public final String lastName;
+            public final String emailAddress;
 
-        public HouseholdMemberJSON(String userID, String firstName, String lastName, String emailAddress){
-            this.userID = userID;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.emailAddress = emailAddress;
+            public HouseholdMember(String userID, String firstName, String lastName, String emailAddress){
+                this.userID = userID;
+                this.firstName = firstName;
+                this.lastName = lastName;
+                this.emailAddress = emailAddress;
+            }
+        }
+
+        public static class HouseholdList {
+            public final long listID;
+            public final String listName;
+
+            public HouseholdList(long listID, String listName) {
+                this.listID = listID;
+                this.listName = listName;
+            }
         }
     }
 
-    public static class HouseholdListJSON{
-        public final long listID;
-        public final String listName;
-
-        public HouseholdListJSON(long listID, String listName) {
-            this.listID = listID;
-            this.listName = listName;
-        }
-    }
-
-    public static class ListCreateReqJSON extends JSONModel {
+    public static class ListCreateRequest extends JSONModel {
         private final String listName;
-        public ListCreateReqJSON (String name) {
+        public ListCreateRequest(String name) {
             listName = name;
         }
     }
 
-    public static class GetShoppingListResJSON extends JSONModel{
+    public static class GetShoppingListResponse extends JSONModel{
         public final long version;
         public final String name;
-        public final List<ItemJSON> items;
+        public final List<Item> items;
 
-        public GetShoppingListResJSON(long version, String name, List<ItemJSON> items){
+        public GetShoppingListResponse(long version, String name, List<Item> items){
             this.version = version;
             this.name = name;
             this.items = items;
         }
 
-        public static class ItemJSON {
+        public static class Item {
             public final String UPC;
             public final String description;
             public final int quantity;
             public final int fractional;
-            public final ListItemPackagingJSON packaging;
+            public final ListItemPackaging packaging;
 
-            public ItemJSON(String UPC, String description, int quantity, int fractional, String unitName, ListItemPackagingJSON packaging){
+            public Item(String UPC, String description, int quantity, int fractional, String unitName, ListItemPackaging packaging){
                 this.UPC = UPC;
                 this.description = description;
                 this.quantity = quantity;
@@ -177,16 +176,16 @@ public class JSONModels {
                 this.packaging = packaging;
             }
 
-            public static class ListItemPackagingJSON {
+            public static class ListItemPackaging {
                 public final float packageSize;
                 public final int unitID;
                 public final String unitName;
                 public final String unitAbbreviation;
                 public final String packageName;
 
-                public ListItemPackagingJSON(float packageSize, int unitID,
-                                                  String unitName, String unitAbbreviation,
-                                                  String packageName){
+                public ListItemPackaging(float packageSize, int unitID,
+                                         String unitName, String unitAbbreviation,
+                                         String packageName){
                     this.packageSize = packageSize;
                     this.unitID = unitID;
                     this.unitName = unitName;
@@ -197,13 +196,13 @@ public class JSONModels {
         }
     }
 
-    public static class LinkReqJSON extends JSONModel {
+    public static class LinkRequest extends JSONModel {
         public final String description;
         public final String packageName;
         public final int packageUnits;
         public final float packageSize;
 
-        public LinkReqJSON(String description, String packageName, int packageUnits, float packageSize) {
+        public LinkRequest(String description, String packageName, int packageUnits, float packageSize) {
             this.description = description;
             this.packageName = packageName;
             this.packageUnits = packageUnits;
@@ -211,19 +210,19 @@ public class JSONModels {
         }
     }
 
-    public static class CreateUPCResJSON{
+    public static class CreateUPCResponse {
         public final String UPC;
 
-        public CreateUPCResJSON(String UPC){
+        public CreateUPCResponse(String UPC){
             this.UPC = UPC;
         }
     }
 
-    public static class UpdateListJSON extends JSONModel{
+    public static class UpdateListRequest extends JSONModel{
         public final long version;
         public final List<UpdateListItem> items;
 
-        public UpdateListJSON(long version, List<UpdateListItem> items){
+        public UpdateListRequest(long version, List<UpdateListItem> items){
             this.version = version;
             this.items = items;
         }
@@ -241,26 +240,26 @@ public class JSONModels {
         }
     }
 
-    public static class GetInventoryResJSON{
+    public static class GetInventoryResponse {
         public final long version;
-        public final List<InventoryItemJSON> items;
+        public final List<InventoryItem> items;
 
-        public GetInventoryResJSON(long version, List<InventoryItemJSON> items){
+        public GetInventoryResponse(long version, List<InventoryItem> items){
             this.version = version;
             this.items = items;
         }
 
-        public static class InventoryItemJSON extends JSONModel{
+        public static class InventoryItem extends JSONModel{
             public final String UPC;
             public final boolean isInternalUPC;
             public final String description;
             public final int quantity;
             public final int fractional;
-            public final InventoryItemPackagingJSON packaging;
+            public final InventoryItemPackaging packaging;
 
-            public InventoryItemJSON(String UPC, boolean isInternalUPC,
-                                     String description, int quantity,
-                                     int fractional, InventoryItemPackagingJSON packaging){
+            public InventoryItem(String UPC, boolean isInternalUPC,
+                                 String description, int quantity,
+                                 int fractional, InventoryItemPackaging packaging){
                 this.UPC = UPC;
                 this.isInternalUPC = isInternalUPC;
                 this.description = description;
@@ -269,16 +268,16 @@ public class JSONModels {
                 this.packaging = packaging;
             }
 
-            public static class InventoryItemPackagingJSON {
+            public static class InventoryItemPackaging {
                 public final float packageSize;
                 public final int unitID;
                 public final String unitName;
                 public final String unitAbbreviation;
                 public final String packageName;
 
-                public InventoryItemPackagingJSON(float packageSize, int unitID,
-                                                  String unitName, String unitAbbreviation,
-                                                  String packageName){
+                public InventoryItemPackaging(float packageSize, int unitID,
+                                              String unitName, String unitAbbreviation,
+                                              String packageName){
                     this.packageSize = packageSize;
                     this.unitID = unitID;
                     this.unitName = unitName;
@@ -289,11 +288,11 @@ public class JSONModels {
         }
     }
 
-    public static class UpdateInventoryReqJSON extends JSONModel{
+    public static class UpdateInventoryRequest extends JSONModel{
         public final long version;
         public final List<UpdateInventoryItem> items;
 
-        public UpdateInventoryReqJSON(long version, List<UpdateInventoryItem> items){
+        public UpdateInventoryRequest(long version, List<UpdateInventoryItem> items){
             this.version = version;
             this.items = items;
         }
@@ -311,13 +310,13 @@ public class JSONModels {
         }
     }
 
-    public static class ErrorResponseJSON{
+    public static class ErrorResponse {
         public final int errorCode;
         public final String errorName;
         public final int httpStatus;
         public final String errorDescription;
 
-        public ErrorResponseJSON(int errorCode, String errorName, int httpStatus, String errorDescription) {
+        public ErrorResponse(int errorCode, String errorName, int httpStatus, String errorDescription) {
             this.errorCode = errorCode;
             this.errorName = errorName;
             this.httpStatus = httpStatus;

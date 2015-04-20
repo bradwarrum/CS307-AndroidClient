@@ -18,10 +18,6 @@ import com.example.android.virtualpantry.Data.JSONModels;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
-import com.example.android.virtualpantry.Data.JSONModels.UserInfoResJSON;
-import com.example.android.virtualpantry.Data.JSONModels.HouseholdShortJSON;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,8 +95,8 @@ public class HouseholdsActivity extends ActionBarActivity {
     }
 
     private void updateDisplay(String response){
-        final UserInfoResJSON userInfo = JSONModels.gson.fromJson(response, UserInfoResJSON.class);
-        for(HouseholdShortJSON household : userInfo.households){
+        final JSONModels.UserInfoResponse userInfo = JSONModels.gson.fromJson(response, JSONModels.UserInfoResponse.class);
+        for(JSONModels.UserInfoResponse.Household household : userInfo.households){
             Map<String, String> householdMap = new HashMap<String, String>(2);
             householdMap.put("name", household.householdName);
             householdMap.put("description", household.householdDescription);
@@ -117,7 +113,7 @@ public class HouseholdsActivity extends ActionBarActivity {
         mHouseholdsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                HouseholdShortJSON household = userInfo.households.get(position);
+                JSONModels.UserInfoResponse.Household household = userInfo.households.get(position);
                 Intent intent = new Intent(HouseholdsActivity.this, HouseholdActivity.class);
                 intent.putExtra("householdID", household.householdID);
                 startActivity(intent);

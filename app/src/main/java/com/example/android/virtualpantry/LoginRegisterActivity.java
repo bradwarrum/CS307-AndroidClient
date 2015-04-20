@@ -335,7 +335,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
             SharedPreferences.Editor editor = user_info.edit();
             editor.putString(PreferencesHelper.USERNAME, username);
             editor.putString(PreferencesHelper.PASSWORD, password);
-            editor.putString(PreferencesHelper.TOKEN, JSONModels.gson.fromJson(response, JSONModels.LoginResJSON.class).token);
+            editor.putString(PreferencesHelper.TOKEN, JSONModels.gson.fromJson(response, JSONModels.LoginResponse.class).token);
             editor.commit();
 
             //launch next page
@@ -371,7 +371,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
                 request = new Request(
                         NetworkUtility.LOGIN_FILE_PATH,
                         Request.POST,
-                        new JSONModels.LoginReqJSON(mEmail, encryptedPassword));
+                        new JSONModels.LoginRequest(mEmail, encryptedPassword));
             }
 
             @Override
@@ -393,7 +393,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
                 if(result == 200){
                     loginSuccessful(mEmail, mPassword, request.getResponse());
                 } else {
-                    int errorCode = JSONModels.gson.fromJson(request.getResponse(), JSONModels.ErrorResponseJSON.class).errorCode;
+                    int errorCode = JSONModels.gson.fromJson(request.getResponse(), JSONModels.ErrorResponse.class).errorCode;
                     switch (errorCode) {
                     case Request.ERR_REQUEST_FAILED:
                         requestFailed();
@@ -432,7 +432,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
                 request = new Request(
                         NetworkUtility.REGISTER_FILE_PATH,
                         Request.POST,
-                        new JSONModels.RegisterReqJSON(mEmail, encryptedPassword, mFirstName, mLastName));
+                        new JSONModels.RegisterRequest(mEmail, encryptedPassword, mFirstName, mLastName));
             }
 
             @Override
@@ -456,7 +456,7 @@ public class LoginRegisterActivity extends ActionBarActivity {
                 } else {
                     Log.e(LOG_TAG, "Response code was: " + result);
                     Log.e(LOG_TAG, "Response was: " + request.getResponse());
-                    int errorCode = JSONModels.gson.fromJson(request.getResponse(), JSONModels.ErrorResponseJSON.class).errorCode;
+                    int errorCode = JSONModels.gson.fromJson(request.getResponse(), JSONModels.ErrorResponse.class).errorCode;
                     switch (errorCode) {
                         case Request.ERR_EMAIL_TAKEN:
                             emailTaken();

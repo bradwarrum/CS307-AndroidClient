@@ -1,7 +1,6 @@
 package com.example.android.virtualpantry;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -20,13 +19,11 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.virtualpantry.Data.JSONModels;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
-import com.example.android.virtualpantry.Data.JSONModels.GetInventoryResJSON;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,8 +39,8 @@ public class InventoryActivity extends ActionBarActivity {
     private ListView mInventory;
     private long mHouseholdID;
 
-    private GetInventoryResJSON mInventoryJSON;
-    private JSONModels.HouseholdJSON mHouseholdJSON;
+    private JSONModels.GetInventoryResponse mInventoryJSON;
+    private JSONModels.Household mHousehold;
 
     private String householdName;
 
@@ -91,19 +88,19 @@ public class InventoryActivity extends ActionBarActivity {
     }
 
     private void updateDisplay(String response){
-        mInventoryJSON = JSONModels.gson.fromJson(response, GetInventoryResJSON.class);
+        mInventoryJSON = JSONModels.gson.fromJson(response, JSONModels.GetInventoryResponse.class);
         mVersion.setText(new Long(mInventoryJSON.version).toString());
         mInventoryData = new ArrayList<Map<String, String>>();
-        List<GetInventoryResJSON.InventoryItemJSON> emptyItems = new ArrayList<>();
-        for(GetInventoryResJSON.InventoryItemJSON item : mInventoryJSON.items){
+        List<JSONModels.GetInventoryResponse.InventoryItem> emptyItems = new ArrayList<>();
+        for(JSONModels.GetInventoryResponse.InventoryItem item : mInventoryJSON.items){
             if(item.quantity == 0){
                 emptyItems.add(item);
             }
         }
-        for(GetInventoryResJSON.InventoryItemJSON item : emptyItems){
+        for(JSONModels.GetInventoryResponse.InventoryItem item : emptyItems){
             mInventoryJSON.items.remove(item);
         }
-        for(GetInventoryResJSON.InventoryItemJSON item : mInventoryJSON.items){
+        for(JSONModels.GetInventoryResponse.InventoryItem item : mInventoryJSON.items){
             Map<String, String> inventoryItem = new HashMap<>(2);
             inventoryItem.put("itemName", item.description);
             String subtitle = "";
@@ -228,7 +225,7 @@ public class InventoryActivity extends ActionBarActivity {
         builder.setTitle("Move Item to Shopping list");
         final Spinner spinner = new Spinner(this);
         List<String> lists = new ArrayList<String>();
-        for(JSONModels.HouseholdListJSON list : mHouseholdJSON.lists){
+        for(JSONModels.Household.HouseholdList list : mHousehold.lists){
             lists.add(list.listName);
         }
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(
@@ -239,7 +236,7 @@ public class InventoryActivity extends ActionBarActivity {
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                moveItemToList(UPC, quantity, mHouseholdJSON.lists.get(spinner.getSelectedItemPosition()).listID);
+                moveItemToList(UPC, quantity, mHousehold.lists.get(spinner.getSelectedItemPosition()).listID);
                 dialog.cancel();
             }
         });
@@ -372,9 +369,9 @@ public class InventoryActivity extends ActionBarActivity {
         @Override
         protected Integer doInBackground(Void... params) {
             //INVENTORY MODE
-            List<JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem> items = new ArrayList<>();
-            items.add(new JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem(mUPC, mQuantity, mFractional));
-            JSONModels.UpdateInventoryReqJSON updateJSON = new JSONModels.UpdateInventoryReqJSON(mVersion, items);
+            List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> items = new ArrayList<>();
+            items.add(new JSONModels.UpdateInventoryRequest.UpdateInventoryItem(mUPC, mQuantity, mFractional));
+            JSONModels.UpdateInventoryRequest updateJSON = new JSONModels.UpdateInventoryRequest(mVersion, items);
             request = new Request(
                     NetworkUtility.createUpdateInventoryString(mHouseholdID, mToken),
                     Request.POST,
@@ -470,7 +467,7 @@ public class InventoryActivity extends ActionBarActivity {
         protected void onPostExecute(Integer result) {
             switch(result){
                 case 200:
-                    mHouseholdJSON = JSONModels.gson.fromJson(request.getResponse(), JSONModels.HouseholdJSON.class);
+                    mHousehold = JSONModels.gson.fromJson(request.getResponse(), JSONModels.Household.class);
                     break;
                 default:
                     Log.e(LOG_TAG, "Failed to get household info: " +
@@ -536,7 +533,7 @@ public class InventoryActivity extends ActionBarActivity {
         protected void onPostExecute(Integer result) {
             switch (result) {
                 case 200:
-                    long version = JSONModels.gson.fromJson(request.getResponse(), JSONModels.GetShoppingListResJSON.class).version;
+                    long version = JSONModels.gson.fromJson(request.getResponse(), JSONModels.GetShoppingListResponse.class).version;
                     new UpdateListQuantityTask(mHouseholdID, mListID, version, mUPC, mQuantity, 0, mToken).execute((Void) null);
                     break;
                 default:
@@ -574,9 +571,9 @@ public class InventoryActivity extends ActionBarActivity {
         @Override
         protected Integer doInBackground(Void... params) {
             //INVENTORY MODE
-            List<JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem> items = new ArrayList<>();
-            items.add(new JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem(mUPC, mQuantity, mFractional));
-            JSONModels.UpdateInventoryReqJSON updateJSON = new JSONModels.UpdateInventoryReqJSON(mVersion, items);
+            List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> items = new ArrayList<>();
+            items.add(new JSONModels.UpdateInventoryRequest.UpdateInventoryItem(mUPC, mQuantity, mFractional));
+            JSONModels.UpdateInventoryRequest updateJSON = new JSONModels.UpdateInventoryRequest(mVersion, items);
             request = new Request(
                     NetworkUtility.createUpdateShoppingListString(mHouseholdID, mListID, mToken),
                     Request.POST,

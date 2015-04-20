@@ -14,14 +14,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.virtualpantry.Data.JSONModels;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
-import com.example.android.virtualpantry.Data.JSONModels.GetShoppingListResJSON;
-import com.example.android.virtualpantry.Data.JSONModels.GetInventoryResJSON;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -49,9 +46,9 @@ public class ActiveListActivity extends ActionBarActivity {
     private long mHouseholdID;
     private long mListID;
 
-    private List<JSONModels.GetShoppingListResJSON.ItemJSON> mItemsInCart;
+    private List<JSONModels.GetShoppingListResponse.Item> mItemsInCart;
 
-    private GetShoppingListResJSON mShoppingListJSON;
+    private JSONModels.GetShoppingListResponse mShoppingListJSON;
     private List<Map<String, String>> mListData;
     private SimpleAdapter mListDataAdapter;
 
@@ -117,19 +114,19 @@ public class ActiveListActivity extends ActionBarActivity {
                 .getString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, null);
         itemsInCartStr = itemsInCartStr.trim();
         Set<String> itemsInCart = new HashSet<String>(Arrays.asList(itemsInCartStr.split(",")));
-        mShoppingListJSON = JSONModels.gson.fromJson(response, JSONModels.GetShoppingListResJSON.class);
+        mShoppingListJSON = JSONModels.gson.fromJson(response, JSONModels.GetShoppingListResponse.class);
         mHeader.setText(mShoppingListJSON.name);
         mSubtitle.setText(new Long(mShoppingListJSON.version).toString());
         mListData = new ArrayList<Map<String, String>>();
         mCartData = new ArrayList<Map<String, String>>();
         mItemsInCart = new ArrayList<>();
-        for(JSONModels.GetShoppingListResJSON.ItemJSON item : mShoppingListJSON.items) {
+        for(JSONModels.GetShoppingListResponse.Item item : mShoppingListJSON.items) {
             if(itemsInCart.contains(item.UPC)){
                 mItemsInCart.add(item);
             }
         }
         mShoppingListJSON.items.removeAll(mItemsInCart);
-        for(JSONModels.GetShoppingListResJSON.ItemJSON item : mShoppingListJSON.items){
+        for(JSONModels.GetShoppingListResponse.Item item : mShoppingListJSON.items){
             Map<String, String> listItem = new HashMap<>(2);
             listItem.put("itemName", item.description);
             String subtitle = "";
@@ -142,7 +139,7 @@ public class ActiveListActivity extends ActionBarActivity {
             listItem.put("info", subtitle);
             mListData.add(listItem);
         }
-        for(JSONModels.GetShoppingListResJSON.ItemJSON item : mItemsInCart){
+        for(JSONModels.GetShoppingListResponse.Item item : mItemsInCart){
             Map<String, String> listItem = new HashMap<>(2);
             listItem.put("itemName", item.description);
             String subtitle = "";
@@ -261,19 +258,19 @@ public class ActiveListActivity extends ActionBarActivity {
 
     //todo:
     private void saveToInventory(String response){
-        GetInventoryResJSON inventory = JSONModels.gson.fromJson(response, GetInventoryResJSON.class);
-        List<JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem> inventoryItems = new ArrayList<>();
-        List<JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem> listItems = new ArrayList<>();
+        JSONModels.GetInventoryResponse inventory = JSONModels.gson.fromJson(response, JSONModels.GetInventoryResponse.class);
+        List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> inventoryItems = new ArrayList<>();
+        List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> listItems = new ArrayList<>();
         String itemsInCartStr = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE)
                 .getString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, null);
         itemsInCartStr = itemsInCartStr.trim();
         String[] itemsInCart = itemsInCartStr.split(",");
         ArrayList<String> newCart = new ArrayList<String>(Arrays.asList(itemsInCart));
         for(String newInventoryItem : newCart){
-            for(GetShoppingListResJSON.ItemJSON cartItem : mItemsInCart){
+            for(JSONModels.GetShoppingListResponse.Item cartItem : mItemsInCart){
                 if(cartItem.UPC.equals(newInventoryItem)){
-                    inventoryItems.add(new JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem(newInventoryItem, cartItem.quantity, cartItem.fractional));
-                    listItems.add(new JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem(newInventoryItem, 0, 0));
+                    inventoryItems.add(new JSONModels.UpdateInventoryRequest.UpdateInventoryItem(newInventoryItem, cartItem.quantity, cartItem.fractional));
+                    listItems.add(new JSONModels.UpdateInventoryRequest.UpdateInventoryItem(newInventoryItem, 0, 0));
                     takeItemFromCartNoUIUpdate(cartItem.UPC);
                     break;
                 }
@@ -287,10 +284,10 @@ public class ActiveListActivity extends ActionBarActivity {
             startActivity(intent);
             finish();
         }
-        JSONModels.UpdateInventoryReqJSON update = new JSONModels.UpdateInventoryReqJSON(inventory.version, inventoryItems);
+        JSONModels.UpdateInventoryRequest update = new JSONModels.UpdateInventoryRequest(inventory.version, inventoryItems);
         new UpdateInventoryQuantityTask(mHouseholdID, update, token).execute((Void) null);
         //fix the list now
-        JSONModels.UpdateInventoryReqJSON updateJSON = new JSONModels.UpdateInventoryReqJSON(mShoppingListJSON.version, listItems);
+        JSONModels.UpdateInventoryRequest updateJSON = new JSONModels.UpdateInventoryRequest(mShoppingListJSON.version, listItems);
         new UpdateListQuantityTask(mHouseholdID, updateJSON, token).execute((Void) null);
     }
 
@@ -459,12 +456,12 @@ public class ActiveListActivity extends ActionBarActivity {
         private static final String LOG_TAG = "UpdateInvQtyTask";
         private String mToken;
         private final long mHouseholdID;
-        JSONModels.UpdateInventoryReqJSON mUpdate;
+        JSONModels.UpdateInventoryRequest mUpdate;
 
         private Request request;
 
 
-        public UpdateInventoryQuantityTask(long householdID, JSONModels.UpdateInventoryReqJSON update, String token){
+        public UpdateInventoryQuantityTask(long householdID, JSONModels.UpdateInventoryRequest update, String token){
             mHouseholdID = householdID;
             mToken = token;
             mUpdate = update;
@@ -524,12 +521,12 @@ public class ActiveListActivity extends ActionBarActivity {
         private static final String LOG_TAG = "UpdateListQtyTask";
         private String mToken;
         private final long mHouseholdID;
-        private JSONModels.UpdateInventoryReqJSON mJSON;
+        private JSONModels.UpdateInventoryRequest mJSON;
 
         private Request request;
 
 
-        public UpdateListQuantityTask(long householdID, JSONModels.UpdateInventoryReqJSON json, String token){
+        public UpdateListQuantityTask(long householdID, JSONModels.UpdateInventoryRequest json, String token){
             mHouseholdID = householdID;
             mToken = token;
             mJSON = json;

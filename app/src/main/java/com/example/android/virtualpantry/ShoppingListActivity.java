@@ -21,7 +21,6 @@ import com.example.android.virtualpantry.Data.JSONModels;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
-import com.example.android.virtualpantry.Data.JSONModels.GetShoppingListResJSON;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public class ShoppingListActivity extends ActionBarActivity {
     private long mListID;
     private long mHouseholdID;
 
-    private GetShoppingListResJSON mShoppingListJSON;
+    private JSONModels.GetShoppingListResponse mShoppingListJSON;
 
     private List<Map<String, String>> mListData;
     private SimpleAdapter mListDataAdapter;
@@ -83,11 +82,11 @@ public class ShoppingListActivity extends ActionBarActivity {
     }
 
     private void updateDisplay(String response){
-        mShoppingListJSON = JSONModels.gson.fromJson(response, GetShoppingListResJSON.class);
+        mShoppingListJSON = JSONModels.gson.fromJson(response, JSONModels.GetShoppingListResponse.class);
         mHeader.setText(mShoppingListJSON.name);
         mVersion.setText(new Long(mShoppingListJSON.version).toString());
         mListData = new ArrayList<Map<String, String>>();
-        for(GetShoppingListResJSON.ItemJSON item : mShoppingListJSON.items){
+        for(JSONModels.GetShoppingListResponse.Item item : mShoppingListJSON.items){
             Map<String, String> listItem = new HashMap<>(2);
             listItem.put("itemName", item.description);
             String subtitle = "";
@@ -311,9 +310,9 @@ public class ShoppingListActivity extends ActionBarActivity {
         @Override
         protected Integer doInBackground(Void... params) {
             //INVENTORY MODE
-            List<JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem> items = new ArrayList<>();
-            items.add(new JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem(mUPC, mQuantity, mFractional));
-            JSONModels.UpdateInventoryReqJSON updateJSON = new JSONModels.UpdateInventoryReqJSON(mVersion, items);
+            List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> items = new ArrayList<>();
+            items.add(new JSONModels.UpdateInventoryRequest.UpdateInventoryItem(mUPC, mQuantity, mFractional));
+            JSONModels.UpdateInventoryRequest updateJSON = new JSONModels.UpdateInventoryRequest(mVersion, items);
             request = new Request(
                     NetworkUtility.createUpdateShoppingListString(mHouseholdID, mListID, mToken),
                     Request.POST,

@@ -342,14 +342,14 @@ public class AddItemActivity extends ActionBarActivity {
                 request = new Request(
                         NetworkUtility.createLinkUPCString(mHouseholdID, mUPC, mToken),
                         Request.POST,
-                        new JSONModels.LinkReqJSON(mDescription, mPackageName,
+                        new JSONModels.LinkRequest(mDescription, mPackageName,
                                 mUnitType, mPackageSize).toString()
                 );
             } else {
                 request = new Request(
                         NetworkUtility.createLinkNoUPCString(mHouseholdID, mToken),
                         Request.POST,
-                        new JSONModels.LinkReqJSON(mDescription, mPackageName,
+                        new JSONModels.LinkRequest(mDescription, mPackageName,
                                 mUnitType, mPackageSize).toString()
                 );
             }
@@ -375,22 +375,22 @@ public class AddItemActivity extends ActionBarActivity {
                 } else if (request.getResponseCode() == 200){
                     //push item to list
                     if(mUPC == null){
-                        mUPC = JSONModels.gson.fromJson(request.getResponse(), JSONModels.CreateUPCResJSON.class).UPC;
+                        mUPC = JSONModels.gson.fromJson(request.getResponse(), JSONModels.CreateUPCResponse.class).UPC;
                     }
                     if(mMode == LIST_MODE) {
-                        List<JSONModels.UpdateListJSON.UpdateListItem> items = new ArrayList<>();
-                        items.add(new JSONModels.UpdateListJSON.UpdateListItem(mUPC, mQuantity, mFraction));
-                        JSONModels.UpdateListJSON updateListJSON = new JSONModels.UpdateListJSON(mVersionNo, items);
+                        List<JSONModels.UpdateListRequest.UpdateListItem> items = new ArrayList<>();
+                        items.add(new JSONModels.UpdateListRequest.UpdateListItem(mUPC, mQuantity, mFraction));
+                        JSONModels.UpdateListRequest updateListRequest = new JSONModels.UpdateListRequest(mVersionNo, items);
                         request = new Request(
                                 NetworkUtility.createUpdateShoppingListString(mHouseholdID, mListID, mToken),
                                 Request.POST,
-                                updateListJSON
+                                updateListRequest
                         );
                     } else {
                         //INVENTORY MODE
-                        List<JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem> items = new ArrayList<>();
-                        items.add(new JSONModels.UpdateInventoryReqJSON.UpdateInventoryItem(mUPC, mQuantity, mFraction));
-                        JSONModels.UpdateInventoryReqJSON updateJSON = new JSONModels.UpdateInventoryReqJSON(mVersion, items);
+                        List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> items = new ArrayList<>();
+                        items.add(new JSONModels.UpdateInventoryRequest.UpdateInventoryItem(mUPC, mQuantity, mFraction));
+                        JSONModels.UpdateInventoryRequest updateJSON = new JSONModels.UpdateInventoryRequest(mVersion, items);
                         request = new Request(
                                 NetworkUtility.createUpdateInventoryString(mHouseholdID, mToken),
                                 Request.POST,

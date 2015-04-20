@@ -23,11 +23,7 @@ import com.example.android.virtualpantry.Data.JSONModels;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
-import com.example.android.virtualpantry.Data.JSONModels.HouseholdJSON;
-import com.example.android.virtualpantry.Data.JSONModels.HouseholdMemberJSON;
-import com.example.android.virtualpantry.Data.JSONModels.HouseholdListJSON;
-
-import org.w3c.dom.Text;
+import com.example.android.virtualpantry.Data.JSONModels.Household;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +41,7 @@ public class HouseholdActivity extends ActionBarActivity {
     private TextView mMembers;
     private Button mCreateListButton;
     private ListView mShoppingLists;
-    private HouseholdJSON mHouseholdJSON = null;
+    private Household mHousehold = null;
     private GetHouseholdInfoTask mHouseholdTask = null;
     private long mHouseholdID;
     private Button mViewInventorybutton;
@@ -96,7 +92,7 @@ public class HouseholdActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Set<Long> listIDs = new HashSet<Long>();
-                for(HouseholdListJSON list : mHouseholdJSON.lists){
+                for(Household.HouseholdList list : mHousehold.lists){
                     listIDs.add(list.listID);
                 }
                 if(listIDs.contains(getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getLong(PreferencesHelper.SHOPPING_CART_LIST_ID, -1))){
@@ -147,7 +143,7 @@ public class HouseholdActivity extends ActionBarActivity {
                 SharedPreferences.Editor editor = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).edit();
                 editor.putString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, " ");
                 editor.putLong(PreferencesHelper.SHOPPING_CART_HOUSEHOLD_ID, mHouseholdID);
-                editor.putLong(PreferencesHelper.SHOPPING_CART_LIST_ID, mHouseholdJSON.lists.get(position).listID);
+                editor.putLong(PreferencesHelper.SHOPPING_CART_LIST_ID, mHousehold.lists.get(position).listID);
                 editor.commit();
                 Intent intent = new Intent(HouseholdActivity.this, ActiveListActivity.class);
                 startActivity(intent);
@@ -175,11 +171,11 @@ public class HouseholdActivity extends ActionBarActivity {
     }
 
     private void updateDisplay(String response){
-        mHouseholdJSON = JSONModels.gson.fromJson(response, HouseholdJSON.class);
-        mHeader.setText(mHouseholdJSON.householdName);
-        mSubtitle.setText(mHouseholdJSON.householdDescription);
+        mHousehold = JSONModels.gson.fromJson(response, Household.class);
+        mHeader.setText(mHousehold.householdName);
+        mSubtitle.setText(mHousehold.householdDescription);
         lists = new ArrayList<Map<String, String>>();
-        for(HouseholdListJSON list : mHouseholdJSON.lists){
+        for(Household.HouseholdList list : mHousehold.lists){
             Map<String, String> listEntry = new HashMap<>(2);
             listEntry.put("list", list.listName);
             listEntry.put("ID", "ID: " + new Long(list.listID).toString());
@@ -195,7 +191,7 @@ public class HouseholdActivity extends ActionBarActivity {
         mShoppingLists.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                HouseholdListJSON list = mHouseholdJSON.lists.get(position);
+                Household.HouseholdList list = mHousehold.lists.get(position);
                 Intent intent = new Intent(HouseholdActivity.this, ShoppingListActivity.class);
                 intent.putExtra("householdID", mHouseholdID);
                 intent.putExtra("listID", list.listID);
@@ -207,7 +203,7 @@ public class HouseholdActivity extends ActionBarActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(HouseholdActivity.this, InventoryActivity.class);
                 intent.putExtra("householdID", mHouseholdID);
-                intent.putExtra("householdName", mHouseholdJSON.householdName);
+                intent.putExtra("householdName", mHousehold.householdName);
                 startActivity(intent);
             }
         });
@@ -319,7 +315,7 @@ public class HouseholdActivity extends ActionBarActivity {
             request = new Request(
                     NetworkUtility.createCreateListString(mHouseholdID, mToken),
                     Request.POST,
-                    new JSONModels.ListCreateReqJSON(mListName)
+                    new JSONModels.ListCreateRequest(mListName)
             );
             if(request.openConnection()){
                 request.execute();

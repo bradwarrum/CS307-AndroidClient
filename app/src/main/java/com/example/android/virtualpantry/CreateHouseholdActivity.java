@@ -17,8 +17,6 @@ import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
 
-import org.w3c.dom.Text;
-
 
 public class CreateHouseholdActivity extends ActionBarActivity {
 
@@ -117,7 +115,7 @@ public class CreateHouseholdActivity extends ActionBarActivity {
             request = new Request(
                 NetworkUtility.createCreateHouseholdString(mToken),
                 Request.POST,
-                new JSONModels.HouseholdCreateReqJSON(mHouseholdName, mHouseholdDescription)
+                new JSONModels.HouseholdCreateRequest(mHouseholdName, mHouseholdDescription)
             );
             if(request.openConnection()){
                 request.executeNoResponse();
