@@ -100,6 +100,10 @@ public class JSONModels {
         }
     }
 
+    public static class HouseholdCreateResponse {
+        public int householdID;
+    }
+
     public static class Household {
         public final long householdId;
         public final String householdName;
