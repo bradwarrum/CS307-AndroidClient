@@ -10,7 +10,7 @@ import android.content.Context;
 class VPDatabaseHandler extends SQLiteOpenHelper {
 
 
-    private static final int VP_SCHEMA_VERSION = 2;
+    private static final int VP_SCHEMA_VERSION = 3;
     private static final String VP_SCHEMA_NAME = "virtualpantry.db";
 
     private static VPDatabaseHandler dbhandler = null;
@@ -49,8 +49,8 @@ class VPDatabaseHandler extends SQLiteOpenHelper {
                 + "ListID INTEGER PRIMARY KEY,"
                 + "HouseholdID INTEGER NOT NULL REFERENCES Households (ID) ,"
                 + "Name TEXT NOT NULL,"
-                + "Version LONG DEFAULT VALUE 0,"
-                + "Orphaned INTEGER DEFAULT VALUE 0);");
+                + "Version LONG DEFAULT 0,"
+                + "Orphaned INTEGER DEFAULT 0);");
         //InventoryItems table
         db.execSQL("CREATE TABLE InventoryItems ("
                 + "HouseholdID INTEGER NOT NULL REFERENCES Households(ID),"
@@ -71,9 +71,9 @@ class VPDatabaseHandler extends SQLiteOpenHelper {
                 + "HouseholdID INTEGER NOT NULL,"
                 + "DefinedQuantity INTEGER NOT NULL,"
                 + "DefinedFractional INTEGER NOT NULL,"
-                + "CartQuantity INTEGER DEFAULT VALUE 0,"
-                + "CartFractional INTEGER DEFAULT VALUE 0,"
-                + "Orphaned INTEGER DEFAULT VALUE 0,"
+                + "CartQuantity INTEGER DEFAULT 0,"
+                + "CartFractional INTEGER DEFAULT 0,"
+                + "Orphaned INTEGER DEFAULT 0,"
                 + "FOREIGN KEY (UPC, HouseholdID) REFERENCES InventoryItems(UPC, HouseholdID),"
                 + "UNIQUE (UPC, ListID));"
         );
