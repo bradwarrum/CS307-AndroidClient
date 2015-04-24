@@ -102,6 +102,7 @@ public class JSONModels {
 
     public static class HouseholdCreateResponse {
         public int householdID;
+        public long version;
     }
 
     public static class Household {
@@ -154,6 +155,11 @@ public class JSONModels {
         }
     }
 
+    public static class ListCreateResponse {
+        public long version;
+        public int listID;
+    }
+
     public static class GetShoppingListResponse extends JSONModel{
         public final long version;
         public final String name;
@@ -170,14 +176,23 @@ public class JSONModels {
             public final String description;
             public final int quantity;
             public final int fractional;
+            public final int cartQuantity;
+            public final int cartFractional;
             public final ListItemPackaging packaging;
 
-            public Item(String UPC, String description, int quantity, int fractional, String unitName, ListItemPackaging packaging){
+            public Item(String UPC, String description, int quantity, int fractional, ListItemPackaging packaging){
+                this(UPC, description, quantity, fractional, 0, 0, packaging);
+            }
+
+            public Item(String UPC, String description, int quantity, int cartQuantity, int cartFractional, int fractional, ListItemPackaging packaging){
                 this.UPC = UPC;
                 this.description = description;
                 this.quantity = quantity;
                 this.fractional = fractional;
                 this.packaging = packaging;
+                this.cartQuantity = cartQuantity;
+                this.cartFractional = cartFractional;
+
             }
 
             public static class ListItemPackaging {
@@ -312,6 +327,10 @@ public class JSONModels {
                 this.fractional = fractional;
             }
         }
+    }
+
+    public static class UpdateInventoryResponse {
+        public long version;
     }
 
     public static class ErrorResponse {

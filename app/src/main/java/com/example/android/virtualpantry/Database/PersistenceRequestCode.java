@@ -5,5 +5,12 @@ package com.example.android.virtualpantry.Database;
  */
 public enum PersistenceRequestCode {
     CREATE_HOUSEHOLD,
-    USER_INFORMATION
+    FETCH_USER_INFORMATION,
+    FETCH_HOUSEHOLD,
+    CREATE_LIST,
+    UPDATE_LIST,
+    FETCH_CART,
+    FETCH_LIST,
+    COMMIT_CART,
+    DELETE_LIST
 }
