@@ -13,9 +13,15 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.virtualpantry.Data.JSONModels;
+import com.example.android.virtualpantry.Database.HouseholdDataSource;
+import com.example.android.virtualpantry.Database.PersistenceCallback;
+import com.example.android.virtualpantry.Database.PersistenceRequestCode;
+import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
+
+import java.lang.reflect.Type;
 
 
 public class CreateHouseholdActivity extends ActionBarActivity {
@@ -24,7 +30,18 @@ public class CreateHouseholdActivity extends ActionBarActivity {
     private AutoCompleteTextView mHouseholdName;
     private AutoCompleteTextView mHouseholdDescription;
     private TextView mStatusText;
-    private CreateHouseholdTask mCreateHouseholdTask = null;
+    //private CreateHouseholdTask mCreateHouseholdTask = null;
+
+    private PersistenceCallback pcb = new PersistenceCallback() {
+        @Override
+        public void callback(PersistenceRequestCode requestType, PersistenceResponseCode status, Object returnValue, Type returnType) {
+            if (status == PersistenceResponseCode.SUCCESS) {
+                householdCreated();
+            } else {
+                creationFailed();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +60,10 @@ public class CreateHouseholdActivity extends ActionBarActivity {
         });
     }
 
-    private void createHousehold(){
-        if(mCreateHouseholdTask != null){
+    private synchronized void createHousehold(){
+        /*if(mCreateHouseholdTask != null){
             return;
-        }
+        }*/
         mStatusText.setText("Creating new household");
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null);
         if(token == null){
@@ -55,10 +72,13 @@ public class CreateHouseholdActivity extends ActionBarActivity {
             startActivity(intent);
             finish();
         }
+        /*
         mCreateHouseholdTask = new CreateHouseholdTask(token,
                 mHouseholdName.getText().toString(),
                 mHouseholdDescription.getText().toString());
-        mCreateHouseholdTask.execute((Void) null);
+        mCreateHouseholdTask.execute((Void) null);*/
+        HouseholdDataSource hdatasource = new HouseholdDataSource(this);
+        hdatasource.createHousehold(mHouseholdName.getText().toString(), mHouseholdDescription.getText().toString(), pcb);
 
 
     }
@@ -96,6 +116,7 @@ public class CreateHouseholdActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
     public class CreateHouseholdTask extends AsyncTask<Void, Void, Integer>{
 
         private static final String LOG_TAG = "CreateHouseholdTask";
@@ -158,5 +179,7 @@ public class CreateHouseholdActivity extends ActionBarActivity {
                     break;
             }
         }
-    }
+
+
+    }*/
 }

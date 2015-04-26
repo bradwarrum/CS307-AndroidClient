@@ -13,27 +13,33 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.virtualpantry.Data.JSONModels;
+import com.example.android.virtualpantry.Database.HouseholdDataSource;
+import com.example.android.virtualpantry.Database.PersistenceCallback;
+import com.example.android.virtualpantry.Database.PersistenceRequestCode;
+import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
-public class HouseholdsActivity extends ActionBarActivity {
+public class HouseholdsActivity extends UserActivity implements PersistenceCallback{
 
     private Button mCreateHouseholdButton;
-    private Button mViewShoppingCartButton;
     private ListView mHouseholdsList;
     private TextView mSubHeader;
 
     private SimpleAdapter mHouseholdsAdapter;
     private List<Map<String, String>> households;
+    private HouseholdDataSource householdDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +50,13 @@ public class HouseholdsActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         //grab handles
         mCreateHouseholdButton = (Button) findViewById(R.id.CreateHouseholdButton);
-        mViewShoppingCartButton = (Button) findViewById(R.id.ViewShoppingCartButton);
         mHouseholdsList = (ListView) findViewById(R.id.HouseholdsList);
         mSubHeader = (TextView) findViewById(R.id.HouseholdsSubHeader);
-        households = new ArrayList<Map<String, String>>();
 
+        //event listeners
         mCreateHouseholdButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -59,17 +65,23 @@ public class HouseholdsActivity extends ActionBarActivity {
             }
         });
 
+        //data holding
+        households = new ArrayList<Map<String, String>>();
+
+        //database handler
+        householdDataSource = new HouseholdDataSource(this);
+
         //send
-        String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
-                .getString(PreferencesHelper.TOKEN, null);
+        String token = PreferencesHelper.getToken(this);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            cancelToLoginPage();
+        } else {
+            householdDataSource.getUserInformation(true, this);
         }
-        GetUserInfoTask getUserInfoTask = new GetUserInfoTask(token);
-        getUserInfoTask.execute((Void) null);
+
+
+        //GetUserInfoTask getUserInfoTask = new GetUserInfoTask(token);
+        //getUserInfoTask.execute((Void) null);
     }
 
     @Override
@@ -94,8 +106,23 @@ public class HouseholdsActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateDisplay(String response){
-        final JSONModels.UserInfoResponse userInfo = JSONModels.gson.fromJson(response, JSONModels.UserInfoResponse.class);
+    @Override
+    public void callback(PersistenceRequestCode request, PersistenceResponseCode status, Object returnValue, Type returnType) {
+        super.callback(request, status, returnValue, returnType);
+        if(status == PersistenceResponseCode.SUCCESS){
+            switch(request){
+                case FETCH_USER_INFORMATION:
+                    if(returnType == JSONModels.UserInfoResponse.class){
+                        updateDisplay((JSONModels.UserInfoResponse)returnValue);
+                    }
+                    break;
+                default:
+                    Toast.makeText(this, "Unsuported request:" + request, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void updateDisplay(final JSONModels.UserInfoResponse userInfo){
         for(JSONModels.UserInfoResponse.Household household : userInfo.households){
             Map<String, String> householdMap = new HashMap<String, String>(2);
             householdMap.put("name", household.householdName);
@@ -121,6 +148,7 @@ public class HouseholdsActivity extends ActionBarActivity {
         });
     }
 
+    /*
     public class GetUserInfoTask extends AsyncTask<Void, Void, Integer> {
 
         private static final String LOG_TAG = "GetUserInfoTask";
@@ -178,5 +206,5 @@ public class HouseholdsActivity extends ActionBarActivity {
             }
 
         }
-    }
+    }*/
 }

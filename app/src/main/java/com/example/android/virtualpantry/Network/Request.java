@@ -108,6 +108,16 @@ public class Request {
         return true;
     }
 
+    public boolean setHeader(String key, String value) {
+        if (connection == null) return false;
+        try {
+            connection.setRequestProperty(key, value);
+        } catch (IllegalStateException e) {
+            return false;
+        }
+        return true;
+    }
+
     public int getResponseCode(){
         return this.responseCode;
     }

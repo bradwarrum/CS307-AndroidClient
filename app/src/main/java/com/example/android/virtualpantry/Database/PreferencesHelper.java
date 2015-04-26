@@ -1,7 +1,12 @@
 package com.example.android.virtualpantry.Database;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+
+import com.example.android.virtualpantry.LoginRegisterActivity;
 
 /**
  * Created by Garrett on 4/6/2015.
@@ -28,6 +33,12 @@ public class PreferencesHelper {
             return true;
         }
         return false;
+    }
+
+    public static String getToken(Activity activity) {
+        String token = activity.getSharedPreferences(PreferencesHelper.USER_INFO, Context.MODE_PRIVATE)
+                .getString(PreferencesHelper.TOKEN, null);
+        return token;
     }
 
 
