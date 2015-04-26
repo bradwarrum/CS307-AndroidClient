@@ -50,12 +50,10 @@ public class HouseholdsActivity extends UserActivity implements PersistenceCallb
     @Override
     protected void onResume() {
         super.onResume();
-
         //grab handles
         mCreateHouseholdButton = (Button) findViewById(R.id.CreateHouseholdButton);
         mHouseholdsList = (ListView) findViewById(R.id.HouseholdsList);
         mSubHeader = (TextView) findViewById(R.id.HouseholdsSubHeader);
-
         //event listeners
         mCreateHouseholdButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -64,13 +62,10 @@ public class HouseholdsActivity extends UserActivity implements PersistenceCallb
                 startActivity(intent);
             }
         });
-
         //data holding
         households = new ArrayList<Map<String, String>>();
-
         //database handler
         householdDataSource = new HouseholdDataSource(this);
-
         //send
         String token = PreferencesHelper.getToken(this);
         if(token == null){
@@ -78,10 +73,6 @@ public class HouseholdsActivity extends UserActivity implements PersistenceCallb
         } else {
             householdDataSource.getUserInformation(true, this);
         }
-
-
-        //GetUserInfoTask getUserInfoTask = new GetUserInfoTask(token);
-        //getUserInfoTask.execute((Void) null);
     }
 
     @Override
@@ -147,64 +138,4 @@ public class HouseholdsActivity extends UserActivity implements PersistenceCallb
             }
         });
     }
-
-    /*
-    public class GetUserInfoTask extends AsyncTask<Void, Void, Integer> {
-
-        private static final String LOG_TAG = "GetUserInfoTask";
-        private String mToken;
-        private Request request;
-
-
-        public GetUserInfoTask(String token) {
-            mToken = token;
-        }
-
-        @Override
-        protected Integer doInBackground(Void... params) {
-            request = new Request(
-                    NetworkUtility.createGetUserInfoString(mToken),
-                    Request.GET);
-            if(request.openConnection()){
-                request.execute();
-                if(request.getResponseCode() == 403){
-                    //login again
-                    if(NetworkUtility.loginSequence(HouseholdsActivity.this) == 1) {
-                        mToken = HouseholdsActivity.this.getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null);
-                        if(mToken != null) {
-                            request = new Request(
-                                    NetworkUtility.createGetUserInfoString(mToken),
-                                    Request.GET);
-                            return doInBackground((Void) null);
-                        } else {
-                            Log.e(LOG_TAG, "Token was null after re-login");
-                            return -1;
-                        }
-                    } else {
-                        Log.e(LOG_TAG, "Unable to log in again");
-                        return -1;
-                    }
-                }
-            } else {
-                Log.e(LOG_TAG, "Unable to open connection");
-                return -1;
-            }
-            return request.getResponseCode();
-        }
-
-        //todo:
-        @Override
-        protected void onPostExecute(Integer result) {
-            switch(result){
-                case 200:
-                    updateDisplay(request.getResponse());
-                    break;
-                default:
-                    Log.e(LOG_TAG, "Failed to get user info. Response code: " +
-                            result + "\nResponse: " + request.getResponse());
-                    break;
-            }
-
-        }
-    }*/
 }

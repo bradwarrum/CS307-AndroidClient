@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -18,13 +17,17 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.virtualpantry.Data.JSONModels;
+import com.example.android.virtualpantry.Database.HouseholdDataSource;
+import com.example.android.virtualpantry.Database.ListDataSource;
+import com.example.android.virtualpantry.Database.PersistenceRequestCode;
+import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
-import com.example.android.virtualpantry.Network.NetworkUtility;
-import com.example.android.virtualpantry.Network.Request;
 import com.example.android.virtualpantry.Data.JSONModels.Household;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,7 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class HouseholdActivity extends ActionBarActivity {
+public class HouseholdActivity extends UserActivity {
 
     private static final String LOG_TAG = "HouseholdActivity";
     private TextView mHeader;
@@ -42,12 +45,14 @@ public class HouseholdActivity extends ActionBarActivity {
     private Button mCreateListButton;
     private ListView mShoppingLists;
     private Household mHousehold = null;
-    private GetHouseholdInfoTask mHouseholdTask = null;
-    private long mHouseholdID;
-    private Button mViewInventorybutton;
+    private int mHouseholdID;
+    private Button mViewInventoryButton;
 
     private SimpleAdapter mListAdapter;
     private List<Map<String, String>> lists;
+
+    private HouseholdDataSource householdDataSource;
+    private ListDataSource listDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +60,7 @@ public class HouseholdActivity extends ActionBarActivity {
         setContentView(R.layout.activity_household);
         Intent myIntent = getIntent();
         if(myIntent.hasExtra("householdID")){
-            mHouseholdID = myIntent.getLongExtra("householdID", -1);
+            mHouseholdID = myIntent.getIntExtra("householdID", -1);
         } else {
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
         }
@@ -64,30 +69,20 @@ public class HouseholdActivity extends ActionBarActivity {
     @Override
     protected void onResume(){
         super.onResume();
+        //grab handles
         mHeader = (TextView) findViewById(R.id.HouseholdHeader);
         mSubtitle = (TextView) findViewById(R.id.HouseholdSubtitle);
         mMembers = (TextView) findViewById(R.id.HouseholdMembers);
         mCreateListButton = (Button) findViewById(R.id.CreateNewShoppingListButton);
         mShoppingLists = (ListView) findViewById(R.id.ListviewHousehold);
-        mViewInventorybutton = (Button) findViewById(R.id.ViewInventoryButton);
-
+        mViewInventoryButton = (Button) findViewById(R.id.ViewInventoryButton);
+        //event listeners
         mCreateListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createNewListDialog();
             }
         });
-
-        String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
-                .getString(PreferencesHelper.TOKEN, null);
-        if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        }
-        mHouseholdTask = new GetHouseholdInfoTask(mHouseholdID, token);
-        mHouseholdTask.execute((Void) null);
         ((Button) findViewById(R.id.GoToShoppingCartButton)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,23 +96,60 @@ public class HouseholdActivity extends ActionBarActivity {
                 }
             }
         });
+        //get information
+        householdDataSource = new HouseholdDataSource(this);
+        listDataSource = new ListDataSource(this);
+        String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
+                .getString(PreferencesHelper.TOKEN, null);
+        if(token == null){
+            cancelToLoginPage();
+        } else {
+            householdDataSource.getHouseholdInfo(mHouseholdID, true, this);
+            Toast.makeText(this, "Toast", Toast.LENGTH_SHORT).show();
+        }
+        //mHouseholdTask = new GetHouseholdInfoTask(mHouseholdID, token);
+        //mHouseholdTask.execute((Void) null);
+    }
+
+    @Override
+    public void callback(PersistenceRequestCode request, PersistenceResponseCode status, Object returnValue, Type returnType) {
+        Toast.makeText(this, "Callback: " + request + ", " + status, Toast.LENGTH_SHORT).show();
+        super.callback(request, status, returnValue, returnType);
+        if(status == PersistenceResponseCode.SUCCESS){
+            switch(request){
+                case FETCH_HOUSEHOLD:
+                    if(returnType == Household.class);
+                    updateDisplay((Household) returnValue);
+                    break;
+                case CREATE_LIST:
+                    householdDataSource.getHouseholdInfo(mHouseholdID, false, this);
+                    Toast.makeText(this, "List Created", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     private void createNewListDialog(){
         //http://stackoverflow.com/questions/10903754/input-text-dialog-android
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.CreateNewListButtonText));
-
         //set up the input
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
-
         //set up buttons
         builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                createNewList(input.getText().toString());
+                String listName = input.getText().toString();
+                String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
+                        .getString(PreferencesHelper.TOKEN, null);
+                if(token == null){
+                    cancelToLoginPage();
+                }
+                listDataSource.createShoppingList(mHouseholdID, listName, HouseholdActivity.this);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -126,7 +158,6 @@ public class HouseholdActivity extends ActionBarActivity {
                 dialog.cancel();
             }
         });
-
         builder.show();
     }
 
@@ -136,7 +167,6 @@ public class HouseholdActivity extends ActionBarActivity {
         final TextView msg = new TextView(this);
         msg.setText("By making this list the active shopping list you will overwrite the current active shopping list");
         alertBuilder.setView(msg);
-
         alertBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -158,20 +188,8 @@ public class HouseholdActivity extends ActionBarActivity {
         alertBuilder.show();
     }
 
-    private void createNewList(String listName){
-        String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
-                .getString(PreferencesHelper.TOKEN, null);
-        if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        }
-        new CreateListTask(listName, token).execute((Void) null);
-    }
-
-    private void updateDisplay(String response){
-        mHousehold = JSONModels.gson.fromJson(response, Household.class);
+    private void updateDisplay(final Household response){
+        mHousehold = response;
         mHeader.setText(mHousehold.householdName);
         mSubtitle.setText(mHousehold.householdDescription);
         lists = new ArrayList<Map<String, String>>();
@@ -198,7 +216,7 @@ public class HouseholdActivity extends ActionBarActivity {
                 startActivity(intent);
             }
         });
-        mViewInventorybutton.setOnClickListener(new View.OnClickListener() {
+        mViewInventoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(HouseholdActivity.this, InventoryActivity.class);
@@ -239,7 +257,7 @@ public class HouseholdActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+/*
     private class GetHouseholdInfoTask extends AsyncTask<Void, Void, Integer>{
 
         private static final String LOG_TAG = "GetHouseholdInfoTask";
@@ -358,5 +376,5 @@ public class HouseholdActivity extends ActionBarActivity {
             }
 
         }
-    }
+    }*/
 }
