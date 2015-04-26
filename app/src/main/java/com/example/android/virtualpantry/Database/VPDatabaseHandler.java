@@ -3,6 +3,7 @@ package com.example.android.virtualpantry.Database;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
+import android.util.Log;
 
 /**
  * Created by Brad on 4/19/2015.
@@ -18,6 +19,9 @@ class VPDatabaseHandler extends SQLiteOpenHelper {
     public static VPDatabaseHandler getInstance(Context context) {
         if (dbhandler == null) {
             dbhandler = new VPDatabaseHandler(context.getApplicationContext());
+            SQLiteDatabase database = dbhandler.getReadableDatabase();
+            Log.i("PERSISTENCE", "Client database running version " + String.valueOf(database.getVersion()));
+            database.close();
         }
         return dbhandler;
     }
