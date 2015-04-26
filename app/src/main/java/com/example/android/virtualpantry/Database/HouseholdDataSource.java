@@ -139,10 +139,15 @@ public class HouseholdDataSource {
 
                     for (UserInfoResponse.Household h : uir.households) {
                         params.clear();
-                        params.put("ID", h.householdID);
                         params.put("Description", h.householdDescription);
                         params.put("Name", h.householdName);
-                        database.replace("Households", null, params);
+                        if (1 != database.update("Households", params, "ID=?", new String[] {String.valueOf(h.householdID)})) {
+                            params.put("ID", h.householdID);
+                            if (-1 == database.insert("Households", null, params)) {
+                                status = PersistenceResponseCode.ERR_DB_INTERNAL;
+                                return;
+                            }
+                        }
                     }
 
                     database.close();

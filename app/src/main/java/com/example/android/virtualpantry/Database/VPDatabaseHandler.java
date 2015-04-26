@@ -10,7 +10,7 @@ import android.content.Context;
 class VPDatabaseHandler extends SQLiteOpenHelper {
 
 
-    private static final int VP_SCHEMA_VERSION = 3;
+    private static final int VP_SCHEMA_VERSION = 4;
     private static final String VP_SCHEMA_NAME = "virtualpantry.db";
 
     private static VPDatabaseHandler dbhandler = null;
@@ -37,7 +37,7 @@ class VPDatabaseHandler extends SQLiteOpenHelper {
                 +"ID INTEGER PRIMARY KEY,"
                 +"Name TEXT NOT NULL,"
                 +"Description TEXT NOT NULL,"
-                +"Version BIGINT NOT NULL);");
+                +"Version BIGINT DEFAULT 0);");
         //UserInfo Table
         db.execSQL("CREATE TABLE UserInfo ("
                 + "ID INTEGER PRIMARY KEY,"
