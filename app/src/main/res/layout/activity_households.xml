@@ -23,13 +23,6 @@
         android:layout_marginBottom="15sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/ViewShoppingCartButton"
-        android:text="@string/HouseholdsViewShoppingCartButtonText"
-        android:layout_marginBottom="15sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
     <ListView
         android:id="@+id/HouseholdsList"
         android:layout_width="match_parent"

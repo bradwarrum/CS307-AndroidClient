@@ -239,6 +239,7 @@ public class HouseholdActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     private class GetHouseholdInfoTask extends AsyncTask<Void, Void, Integer>{
 
         private static final String LOG_TAG = "GetHouseholdInfoTask";
