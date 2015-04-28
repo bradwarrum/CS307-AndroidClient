@@ -60,10 +60,12 @@ public class HouseholdActivity extends UserActivity {
         setContentView(R.layout.activity_household);
         Intent myIntent = getIntent();
         if(myIntent.hasExtra("householdID")){
-            mHouseholdID = myIntent.getIntExtra("householdID", -1);
+            mHouseholdID = (int)myIntent.getLongExtra("householdID", -1);
         } else {
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
         }
+        Log.e("onCreate", "householdID=" + mHouseholdID);
+        Toast.makeText(this, "householdID: " + mHouseholdID, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -105,7 +107,6 @@ public class HouseholdActivity extends UserActivity {
             cancelToLoginPage();
         } else {
             householdDataSource.getHouseholdInfo(mHouseholdID, true, this);
-            Toast.makeText(this, "Toast", Toast.LENGTH_SHORT).show();
         }
         //mHouseholdTask = new GetHouseholdInfoTask(mHouseholdID, token);
         //mHouseholdTask.execute((Void) null);

@@ -133,6 +133,7 @@ public class HouseholdsActivity extends UserActivity implements PersistenceCallb
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 JSONModels.UserInfoResponse.Household household = userInfo.households.get(position);
                 Intent intent = new Intent(HouseholdsActivity.this, HouseholdActivity.class);
+                Toast.makeText(HouseholdsActivity.this, "HouseholdID: " + household.householdID, Toast.LENGTH_SHORT).show();
                 intent.putExtra("householdID", household.householdID);
                 startActivity(intent);
             }
