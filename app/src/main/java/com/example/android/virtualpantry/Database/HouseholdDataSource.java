@@ -256,7 +256,7 @@ public class HouseholdDataSource {
             private void fetchLocalInfo(int householdID) {
                 SQLiteDatabase database = dbHandler.getReadableDatabase();
                 try {
-                    Cursor c = database.rawQuery("SELECT (Name, Description) FROM Households WHERE ID=?;", new String[] {String.valueOf(householdID)});
+                    Cursor c = database.rawQuery("SELECT Name, Description FROM Households WHERE ID=?;", new String[] {String.valueOf(householdID)});
                     if (!c.moveToFirst()) {
                         status = PersistenceResponseCode.ERR_DB_DATA_NOT_FOUND;
                         return;
@@ -265,7 +265,7 @@ public class HouseholdDataSource {
                     String description = c.getString(1);
                     c.close();
                     List<Household.HouseholdList> lists = new ArrayList<Household.HouseholdList>();
-                    c = database.rawQuery("SELECT (ListID, Name) FROM ShoppingLists WHERE HouseholdID=?;", new String[] {String.valueOf(householdID)});
+                    c = database.rawQuery("SELECT ListID, Name FROM ShoppingLists WHERE HouseholdID=?;", new String[] {String.valueOf(householdID)});
                     if (c.moveToFirst()) {
                         do {
                             lists.add(new Household.HouseholdList(c.getInt(0), c.getString(1)));
