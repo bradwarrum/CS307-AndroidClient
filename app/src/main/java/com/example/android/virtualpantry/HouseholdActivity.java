@@ -1,5 +1,6 @@
 package com.example.android.virtualpantry;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -64,8 +65,6 @@ public class HouseholdActivity extends UserActivity {
         } else {
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
         }
-        Log.e("onCreate", "householdID=" + mHouseholdID);
-        Toast.makeText(this, "householdID: " + mHouseholdID, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -114,7 +113,6 @@ public class HouseholdActivity extends UserActivity {
 
     @Override
     public void callback(PersistenceRequestCode request, PersistenceResponseCode status, Object returnValue, Type returnType) {
-        Toast.makeText(this, "Callback: " + request + ", " + status, Toast.LENGTH_SHORT).show();
         super.callback(request, status, returnValue, returnType);
         if(status == PersistenceResponseCode.SUCCESS){
             switch(request){
@@ -240,6 +238,12 @@ public class HouseholdActivity extends UserActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_household, menu);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(false); // disable the button
+            actionBar.setDisplayHomeAsUpEnabled(false); // remove the left caret
+            actionBar.setDisplayShowHomeEnabled(false); // remove the icon
+        }
         return true;
     }
 

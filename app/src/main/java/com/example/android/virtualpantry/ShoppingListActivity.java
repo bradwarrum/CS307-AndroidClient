@@ -18,6 +18,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.example.android.virtualpantry.Data.JSONModels;
+import com.example.android.virtualpantry.Database.ListDataSource;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
@@ -28,15 +29,17 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ShoppingListActivity extends ActionBarActivity {
+public class ShoppingListActivity extends UserActivity {
 
     private static final String LOG_TAG = "ShoppingListActivity";
     private TextView mHeader;
     private TextView mVersion;
     private Button mAddItemButton;
     private ListView mShoppingList;
-    private long mListID;
-    private long mHouseholdID;
+    private int mListID;
+    private int mHouseholdID;
+
+    private ListDataSource listDataSource;
 
     private JSONModels.GetShoppingListResponse mShoppingListJSON;
 
@@ -49,12 +52,12 @@ public class ShoppingListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_shopping_list);
         Intent myIntent = getIntent();
         if(myIntent.hasExtra("householdID")){
-            mHouseholdID = myIntent.getLongExtra("householdID", -1);
+            mHouseholdID = myIntent.getIntExtra("householdID", -1);
         } else{
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
         }
         if(myIntent.hasExtra("listID")){
-            mListID = myIntent.getLongExtra("listID", -1);
+            mListID = (int)myIntent.getLongExtra("listID", -1);
         } else {
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
         }
@@ -63,22 +66,21 @@ public class ShoppingListActivity extends ActionBarActivity {
     @Override
     protected  void onResume(){
         super.onResume();
+        //handles
         mHeader = (TextView) findViewById(R.id.ShoppingListTitle);
         mVersion = (TextView) findViewById(R.id.ShoppingListVersionNo);
         mAddItemButton = (Button) findViewById(R.id.AddItemButton);
         mShoppingList = (ListView) findViewById(R.id.ShoppingItemList);
 
-
+        listDataSource = new ListDataSource(this);
 
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            cancelToLoginPage();
         }
-        new GetListTask(mHouseholdID, mListID, token).execute((Void) null);
+        listDataSource.getListItems(mHouseholdID, mListID, true, this);
+        //new GetListTask(mHouseholdID, mListID, token).execute((Void) null);
     }
 
     private void updateDisplay(String response){
@@ -206,6 +208,12 @@ public class ShoppingListActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_shopping_list, menu);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(false); // disable the button
+            actionBar.setDisplayHomeAsUpEnabled(false); // remove the left caret
+            actionBar.setDisplayShowHomeEnabled(false); // remove the icon
+        }
         return true;
     }
 
@@ -224,6 +232,7 @@ public class ShoppingListActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
     private class GetListTask extends AsyncTask<Void, Void, Integer> {
 
         private static final String LOG_TAG = "GetListTask";
@@ -358,5 +367,5 @@ public class ShoppingListActivity extends ActionBarActivity {
                     break;
             }
         }
-    }
+    }*/
 }
