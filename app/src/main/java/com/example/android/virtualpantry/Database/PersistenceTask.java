@@ -94,6 +94,7 @@ public abstract class PersistenceTask extends AsyncTask<Void, Void, Void> {
             params.put("PackageName", item.packaging.packageName);
             params.put("Quantity", item.quantity);
             params.put("Fractional", item.fractional);
+            params.put("Description", item.description);
             if (1 != database.update("InventoryItems", params, "UPC=? AND HouseholdID=?", new String[] {item.UPC, String.valueOf(householdID)})) {
                 params.put("UPC", item.UPC);
                 params.put("HouseholdID", householdID);

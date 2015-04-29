@@ -113,6 +113,12 @@ public class InventoryDataSource {
                     JSONModels.GetInventoryResponse resp = parseWebResponse(req, JSONModels.GetInventoryResponse.class);
                     if (resp == null) return;
                     if (updateLocalInventory(database, householdID, resp)) {
+                        ContentValues params = new ContentValues();
+                        params.put("Version", resp.version);
+                        if (1 != database.update("Households", params, "ID=?", new String[] { String.valueOf(householdID)})) {
+                            status = PersistenceResponseCode.ERR_DB_INTERNAL;
+                            return;
+                        }
                         JSONModels.LinkRequest newreq = new JSONModels.LinkRequest(description,packageName, packageUnits, packageSize, resp.version);
                         requeryStage(database, householdID, newreq);
                     } else {
@@ -158,7 +164,7 @@ public class InventoryDataSource {
                 params.put("PackageName", model.packageName);
                 params.put("Quantity", 0);
                 params.put("Fractional", 0);
-                if (-1 == database.insert("InventoryItems", null, params)) {
+                if (-1 == database.replace("InventoryItems", null, params)) {
                     status = PersistenceResponseCode.ERR_DB_INTERNAL;
                     return;
                 } else {
