@@ -224,8 +224,9 @@ public class AddItemActivity extends UserActivity {
             if(token == null){
                 cancelToLoginPage();
             }
+            Toast.makeText(this, "Adding item", Toast.LENGTH_SHORT).show();
             UpdateListItem listItem = new UpdateListItem(barcodeText, Integer.valueOf(quantity), Integer.valueOf(fractional));
-            LinkRequest linkRequest = new LinkRequest(userDescription, packageName, unitType, Integer.valueOf(packageSize));
+            LinkRequest linkRequest = new LinkRequest(userDescription, packageName, unitType, Integer.valueOf(packageSize), mVersion);
             linkTask = new LinkTask(barcodeText, linkRequest, listItem, token, mMode);
             linkTask.execute((Void) null);
             /*mLinkAddItemTask = new LinkAndAddItemTask(barcodeText, userDescription,
@@ -319,6 +320,7 @@ public class AddItemActivity extends UserActivity {
 
         @Override
         protected Integer doInBackground(Void... params) {
+            Log.e(LOG_TAG, "Starting background");
             if (mUPC != null) {
                 request = new Request(
                         NetworkUtility.createLinkUPCString(mHouseholdID, mUPC, mToken),
@@ -373,10 +375,10 @@ public class AddItemActivity extends UserActivity {
         @Override
         protected void onPostExecute(Integer result) {
             linkTask = null;
+            Log.e(LOG_TAG, "Request finished");
             if(result == -2){
                 Toast.makeText(AddItemActivity.this, "Error in Linking item: " + result, Toast.LENGTH_SHORT).show();
-            }
-            if(result == -1){
+            } else if(result == -1){
                 Toast.makeText(AddItemActivity.this, "Error in adding item", Toast.LENGTH_SHORT).show();
             } else if (result == 200){
                 itemAdded();
