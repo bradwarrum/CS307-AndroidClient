@@ -109,7 +109,7 @@ public abstract class PersistenceTask extends AsyncTask<Void, Void, Void> {
     protected final long updateLocalList(SQLiteDatabase database, int householdID, int listID, Context context, long version) {
         ContentValues setOrphan = new ContentValues();
         setOrphan.put("Orphaned", 1);
-        database.update("ShoppingListItem", setOrphan, "ListID = ?", new String[] {String.valueOf(listID)});
+        database.update("ShoppingListItems", setOrphan, "ListID = ?", new String[] {String.valueOf(listID)});
 
         Request req = new Request(NetworkUtility.createGetListString(householdID, listID,
                 context.getSharedPreferences(PreferencesHelper.USER_INFO, Context.MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null)
@@ -126,11 +126,11 @@ public abstract class PersistenceTask extends AsyncTask<Void, Void, Void> {
                 params.put("Orphaned", 0);
                 params.put("DefinedFractional", i.fractional);
                 params.put("DefinedQuantity", i.quantity);
-                if (1 != database.update("ShoppingListItem", params, "UPC=? AND HouseholdID=? AND ListID=?", new String[] {i.UPC, String.valueOf(householdID), String.valueOf(listID)})) {
+                if (1 != database.update("ShoppingListItems", params, "UPC=? AND HouseholdID=? AND ListID=?", new String[] {i.UPC, String.valueOf(householdID), String.valueOf(listID)})) {
                     params.put("HouseholdID", householdID);
                     params.put("UPC", i.UPC);
                     params.put("ListID", listID);
-                    if (-1 == database.insert("ShoppingListItem", null, params)) {
+                    if (-1 == database.insert("ShoppingListItems", null, params)) {
                         status = PersistenceResponseCode.ERR_DB_INTERNAL;
                         return -1;
                     }
