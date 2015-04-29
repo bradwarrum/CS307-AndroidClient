@@ -93,13 +93,16 @@ public class ShoppingListActivity extends UserActivity {
         super.callback(request, status, returnValue, returnType);
         if(status == PersistenceResponseCode.SUCCESS){
             switch(request){
-                case UPDATE_LIST:
+                case FETCH_LIST:
                     if(returnType == JSONModels.GetShoppingListResponse.class) {
                         JSONModels.GetShoppingListResponse shoppingListResponse = (JSONModels.GetShoppingListResponse) returnValue;
                         updateDisplay(shoppingListResponse);
                     } else {
                         Log.e(LOG_TAG, "Error wrong return type: " + returnType);
                     }
+                    break;
+                case UPDATE_LIST:
+                    listDataSource.getListItems(mHouseholdID, mListID, true, this);
                     break;
                 default:
                     Log.e(LOG_TAG, "Unknown database request callback: " + request + ", " + status);

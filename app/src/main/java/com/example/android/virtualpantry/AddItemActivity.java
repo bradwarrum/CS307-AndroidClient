@@ -82,12 +82,12 @@ public class AddItemActivity extends UserActivity {
 
         Intent myIntent = getIntent();
         if(myIntent.hasExtra("householdID")){
-            mHouseholdID = (int)myIntent.getLongExtra("householdID", -1);
+            mHouseholdID = myIntent.getIntExtra("householdID", -1);
         } else{
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
         }
         if(myIntent.hasExtra("listID")){
-            mListID = (int)myIntent.getLongExtra("listID", -1);
+            mListID = myIntent.getIntExtra("listID", -1);
         } else {
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
         }
@@ -303,7 +303,6 @@ public class AddItemActivity extends UserActivity {
     private class LinkTask extends  AsyncTask<Void, Void, Integer>{
 
         private LinkRequest mLinkRequest;
-        private Request mRequest;
         private String mToken;
         private String mUPC;
         private Request request;
@@ -324,13 +323,13 @@ public class AddItemActivity extends UserActivity {
                 request = new Request(
                         NetworkUtility.createLinkUPCString(mHouseholdID, mUPC, mToken),
                         Request.POST,
-                        mRequest.toString()
+                        mLinkRequest.toString()
                 );
             } else {
                 request = new Request(
                         NetworkUtility.createLinkNoUPCString(mHouseholdID, mToken),
                         Request.POST,
-                        mRequest.toString()
+                        mLinkRequest.toString()
                 );
             }
             if(request.openConnection()){
@@ -362,7 +361,10 @@ public class AddItemActivity extends UserActivity {
                         }
                     }
                 }else{
-                    Toast.makeText(AddItemActivity.this, "Error in linking item", Toast.LENGTH_SHORT).show();
+                    Log.e(LOG_TAG, "Destination: " + request.getFilePath());
+                    Log.e(LOG_TAG, "Request: " + request.getSendJSON());
+                    Log.e(LOG_TAG, "Response: " + request.getResponse());
+                    return request.getResponseCode();
                 }
             }
             return -1;
@@ -371,12 +373,15 @@ public class AddItemActivity extends UserActivity {
         @Override
         protected void onPostExecute(Integer result) {
             linkTask = null;
+            if(result == -2){
+                Toast.makeText(AddItemActivity.this, "Error in Linking item: " + result, Toast.LENGTH_SHORT).show();
+            }
             if(result == -1){
                 Toast.makeText(AddItemActivity.this, "Error in adding item", Toast.LENGTH_SHORT).show();
             } else if (result == 200){
                 itemAdded();
             } else {
-                Toast.makeText(AddItemActivity.this, "Error in adding item", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddItemActivity.this, "Unknown return code: " + result, Toast.LENGTH_SHORT).show();
             }
         }
     }
