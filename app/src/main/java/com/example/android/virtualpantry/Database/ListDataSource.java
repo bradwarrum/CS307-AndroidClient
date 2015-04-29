@@ -122,7 +122,7 @@ public class ListDataSource {
                 {
                     req.execute();
 
-                    if (req.getResponseCode() != 200) {
+                    if (req.getResponseCode() == 200) {
                         JSONModels.ListCreateResponse lcr = parseWebResponse(req, JSONModels.ListCreateResponse.class);
                         if (lcr == null) return;
                         handleUpdateSuccess(listID, householdID, version, items);

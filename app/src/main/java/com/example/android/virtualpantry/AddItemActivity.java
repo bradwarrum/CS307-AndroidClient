@@ -265,16 +265,16 @@ public class AddItemActivity extends UserActivity {
                     quantity = unitCount;
                     fractional = "0";
                 }
-                JSONModels.CreateUPCResponse response = (JSONModels.CreateUPCResponse) returnValue;
+                String UPC = (String) returnValue;
                 if (mMode == LIST_MODE) {
-                    UpdateListItem updateItem = new UpdateListItem(response.UPC, Integer.valueOf(quantity), Integer.valueOf(fractional));
+                    UpdateListItem updateItem = new UpdateListItem(UPC, Integer.valueOf(quantity), Integer.valueOf(fractional));
                     List<UpdateListItem> updateList = new ArrayList<UpdateListItem>();
                     updateList.add(updateItem);
                     listDataSource.updateList(mListID, updateList, this);
                 } else {
                     JSONModels.UpdateInventoryRequest.UpdateInventoryItem updateItem =
                             new JSONModels.UpdateInventoryRequest.UpdateInventoryItem(
-                                    response.UPC,
+                                    UPC,
                                     Integer.valueOf(quantity),
                                     Integer.valueOf(fractional));
                     List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> updateList = new ArrayList<>();
