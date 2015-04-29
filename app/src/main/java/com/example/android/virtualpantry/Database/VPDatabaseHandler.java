@@ -26,6 +26,17 @@ class VPDatabaseHandler extends SQLiteOpenHelper {
         return dbhandler;
     }
 
+    public static void purgeInfo(Context context) {
+        VPDatabaseHandler dbHandler = getInstance(context);
+        SQLiteDatabase database = dbHandler.getWritableDatabase();
+        database.delete("ShoppingListItems", null, null);
+        database.delete("InventoryItems", null, null);
+        database.delete("ShoppingLists", null, null);
+        database.delete("UserInfo", null, null);
+        database.delete("Households", null, null);
+        database.close();
+    }
+
 
     /**
      * Private constructor to prevent connection leaks.  Use static method to fetch instance.
