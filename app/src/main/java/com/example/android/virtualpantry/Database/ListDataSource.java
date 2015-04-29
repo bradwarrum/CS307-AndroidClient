@@ -173,6 +173,12 @@ public class ListDataSource {
                                 }
                             }
                         }
+                        params.clear();
+                        params.put("Version", version);
+                        if (1 != database.update("ShoppingLists", params, "ListID=?", new String[] {String.valueOf(listID)})) {
+                            status = PersistenceResponseCode.ERR_DB_INTERNAL;
+                            return;
+                        }
                     }
                     database.setTransactionSuccessful();
                 }finally {
