@@ -21,23 +21,28 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.virtualpantry.Data.JSONModels;
+import com.example.android.virtualpantry.Database.HouseholdDataSource;
+import com.example.android.virtualpantry.Database.InventoryDataSource;
+import com.example.android.virtualpantry.Database.ListDataSource;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
+
+import com.example.android.virtualpantry.Data.JSONModels.UpdateInventoryRequest.UpdateInventoryItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InventoryActivity extends ActionBarActivity {
+public class InventoryActivity extends UserActivity {
 
     private static final String LOG_TAG = "InventoryActivity";
     private TextView mHeader;
     private TextView mVersion;
     private Button mAddItemButton;
     private ListView mInventory;
-    private long mHouseholdID;
+    private int mHouseholdID;
 
     private JSONModels.GetInventoryResponse mInventoryJSON;
     private JSONModels.Household mHousehold;
@@ -47,13 +52,17 @@ public class InventoryActivity extends ActionBarActivity {
     private List<Map<String, String>> mInventoryData;
     private SimpleAdapter mInventoryDataAdapter;
 
+    private ListDataSource listDataSource;
+    private InventoryDataSource invDataSource;
+    private HouseholdDataSource householdDataSource;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
         Intent myIntent = getIntent();
         if(myIntent.hasExtra("householdID")){
-            mHouseholdID = myIntent.getLongExtra("householdID", -1);
+            mHouseholdID = myIntent.getIntExtra("householdID", -1);
         } else{
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
         }
@@ -81,10 +90,14 @@ public class InventoryActivity extends ActionBarActivity {
             startActivity(intent);
             finish();
         }
-        new GetInventoryTask(mHouseholdID, token).execute((Void) null);
-        //Toast toast = Toast.makeText(this.getApplicationContext(), "Fetching Inventory", Toast.LENGTH_SHORT);
-        //toast.show();
-        new GetHouseholdInfoTask(mHouseholdID, token).execute((Void) null);
+
+        householdDataSource = new HouseholdDataSource(this);
+        listDataSource = new ListDataSource(this);
+        invDataSource = new InventoryDataSource(this);
+        invDataSource.getInventory(mHouseholdID, true, this);
+        householdDataSource.getHouseholdInfo(mHouseholdID, true, this);
+        /*new GetInventoryTask(mHouseholdID, token).execute((Void) null);
+        new GetHouseholdInfoTask(mHouseholdID, token).execute((Void) null);*/
     }
 
     private void updateDisplay(String response){
@@ -188,36 +201,44 @@ public class InventoryActivity extends ActionBarActivity {
 
     }
 
-    private void updateQuantity(int position, String quantity){
+    private void updateQuantity(int position, String totalQuantity){
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            cancelToLoginPage();
         }
-        new UpdateInventoryQuantityTask(mHouseholdID, mInventoryJSON.version,
+        String quantity, fractional;
+        if(totalQuantity.contains(".")){
+            quantity = totalQuantity.split(".")[0];
+            fractional = totalQuantity.split(".")[1];
+        } else {
+            quantity = totalQuantity;
+            fractional = "0";
+        }
+        UpdateInventoryItem updateInventoryItem = new UpdateInventoryItem(mInventoryJSON.items.get(position).UPC, Integer.valueOf(quantity), Integer.valueOf(fractional));
+        List<UpdateInventoryItem> updateList = new ArrayList<>();
+        invDataSource.updateInventoryQuantity(mHouseholdID, updateList, this);
+        /*new UpdateInventoryQuantityTask(mHouseholdID, mInventoryJSON.version,
                 mInventoryJSON.items.get(position).UPC,
                 new Integer(quantity).intValue(),
                 mInventoryJSON.items.get(position).fractional,
-                 token).execute((Void) null);
+                 token).execute((Void) null);*/
     }
 
     private void removeItem(int position){
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            cancelToLoginPage();
         }
-        new UpdateInventoryQuantityTask(mHouseholdID, mInventoryJSON.version,
+        UpdateInventoryItem updateInventoryItem = new UpdateInventoryItem(mInventoryJSON.items.get(position).UPC, 0, 0);
+        List<UpdateInventoryItem> updateList = new ArrayList<>();
+        invDataSource.updateInventoryQuantity(mHouseholdID, updateList, this);
+        /*new UpdateInventoryQuantityTask(mHouseholdID, mInventoryJSON.version,
                 mInventoryJSON.items.get(position).UPC,
                 0,
                 mInventoryJSON.items.get(position).fractional,
-                token).execute((Void) null);
+                token).execute((Void) null);*/
     }
 
     private void moveItem(final String UPC, final int quantity){
@@ -236,7 +257,7 @@ public class InventoryActivity extends ActionBarActivity {
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                moveItemToList(UPC, quantity, mHousehold.lists.get(spinner.getSelectedItemPosition()).listID);
+                moveItemToList(UPC, quantity, (int)mHousehold.lists.get(spinner.getSelectedItemPosition()).listID);
                 dialog.cancel();
             }
         });
@@ -249,7 +270,7 @@ public class InventoryActivity extends ActionBarActivity {
         builder.show();
     }
 
-    private void moveItemToList(String UPC, int quantity, long listID){
+    private void moveItemToList(String UPC, int quantity, int listID){
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
@@ -258,7 +279,8 @@ public class InventoryActivity extends ActionBarActivity {
             startActivity(intent);
             finish();
         }
-        new GetListTask(mHouseholdID, listID, UPC, quantity, token).execute((Void) null);
+        listDataSource.getListItems(mHouseholdID, listID, true, this);
+        //new GetListTask(mHouseholdID, listID, UPC, quantity, token).execute((Void) null);
     }
 
 
@@ -284,6 +306,7 @@ public class InventoryActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
     private class GetInventoryTask extends AsyncTask<Void, Void, Integer>{
 
         private static final String LOG_TAG = "GetInventoryTask";
@@ -619,5 +642,5 @@ public class InventoryActivity extends ActionBarActivity {
                     break;
             }
         }
-    }
+    }*/
 }
