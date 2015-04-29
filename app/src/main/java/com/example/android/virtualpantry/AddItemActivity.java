@@ -18,7 +18,10 @@ import android.widget.Toast;
 
 import com.example.android.virtualpantry.Data.JSONModels;
 import com.example.android.virtualpantry.Data.MeasurementUnit;
+import com.example.android.virtualpantry.Database.InventoryDataSource;
 import com.example.android.virtualpantry.Database.ListDataSource;
+import com.example.android.virtualpantry.Database.PersistenceRequestCode;
+import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
@@ -28,6 +31,7 @@ import com.google.zxing.integration.android.IntentResult;
 import com.example.android.virtualpantry.Data.JSONModels.LinkRequest;
 import com.example.android.virtualpantry.Data.JSONModels.UpdateListRequest.UpdateListItem;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +62,7 @@ public class AddItemActivity extends UserActivity {
     private int mMode;
 
     private ListDataSource listDataSource;
+    private InventoryDataSource invDataSource;
 
     private LinkTask linkTask = null;
 
@@ -79,6 +84,7 @@ public class AddItemActivity extends UserActivity {
         mPackageSize = (EditText) findViewById(R.id.ItemPackageSize);
 
         listDataSource = new ListDataSource(this);
+        invDataSource = new InventoryDataSource(this);
 
         Intent myIntent = getIntent();
         if(myIntent.hasExtra("householdID")){
@@ -227,8 +233,13 @@ public class AddItemActivity extends UserActivity {
             Toast.makeText(this, "Adding item", Toast.LENGTH_SHORT).show();
             UpdateListItem listItem = new UpdateListItem(barcodeText, Integer.valueOf(quantity), Integer.valueOf(fractional));
             LinkRequest linkRequest = new LinkRequest(userDescription, packageName, unitType, Integer.valueOf(packageSize), mVersion);
-            linkTask = new LinkTask(barcodeText, linkRequest, listItem, token, mMode);
-            linkTask.execute((Void) null);
+            if(barcodeText == null){
+                invDataSource.generateUPC(mHouseholdID, userDescription, packageName, unitType, Integer.valueOf(packageSize), this);
+            } else {
+                invDataSource.linkUPC(mHouseholdID, barcodeText, userDescription, packageName, unitType, Integer.valueOf(packageSize), this);
+            }
+            /*linkTask = new LinkTask(barcodeText, linkRequest, listItem, token, mMode);
+            linkTask.execute((Void) null);*/
             /*mLinkAddItemTask = new LinkAndAddItemTask(barcodeText, userDescription,
                    packageName, new Float(packageSize),
                    new Integer(unitCount), new Integer(unitFraction),
@@ -236,6 +247,44 @@ public class AddItemActivity extends UserActivity {
                    mVersion, mListID,
                    token, mMode);
                 mLinkAddItemTask.execute((Void) null);*/
+        }
+    }
+
+    @Override
+    public void callback(PersistenceRequestCode request, PersistenceResponseCode status, Object returnValue, Type returnType) {
+        super.callback(request, status, returnValue, returnType);
+        if(status == PersistenceResponseCode.SUCCESS) {
+            if (request == PersistenceRequestCode.LINK_UPC) {
+                String quantity, fractional;
+                String unitCount = mItemUnitCount.getText().toString();
+                if (unitCount.contains(".")) {
+                    quantity = unitCount.split(".")[0];
+                    fractional = unitCount.split(".")[1];
+                } else {
+                    quantity = unitCount;
+                    fractional = "0";
+                }
+                JSONModels.CreateUPCResponse response = (JSONModels.CreateUPCResponse) returnValue;
+                if (mMode == LIST_MODE) {
+                    UpdateListItem updateItem = new UpdateListItem(response.UPC, Integer.valueOf(quantity), Integer.valueOf(fractional));
+                    List<UpdateListItem> updateList = new ArrayList<UpdateListItem>();
+                    updateList.add(updateItem);
+                    listDataSource.updateList(mListID, updateList, this);
+                } else {
+                    JSONModels.UpdateInventoryRequest.UpdateInventoryItem updateItem =
+                            new JSONModels.UpdateInventoryRequest.UpdateInventoryItem(
+                                    response.UPC,
+                                    Integer.valueOf(quantity),
+                                    Integer.valueOf(fractional));
+                    List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> updateList = new ArrayList<>();
+                    updateList.add(updateItem);
+                    invDataSource.updateInventoryQuantity(mHouseholdID, updateList, this);
+                }
+            } else if (request == PersistenceRequestCode.UPDATE_LIST){
+                itemAdded();
+            }
+        } else {
+            Toast.makeText(this, "Error in data access of " + request + " result in " + status, Toast.LENGTH_LONG).show();
         }
     }
 
