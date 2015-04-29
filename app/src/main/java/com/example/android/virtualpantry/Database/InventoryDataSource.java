@@ -53,6 +53,7 @@ public class InventoryDataSource {
         PersistenceTask task = new PersistenceTask(callback) {
             @Override
             protected void doInBackground() {
+                requestType = PersistenceRequestCode.LINK_UPC;
                 SQLiteDatabase database = dbHandler.getWritableDatabase();
                 database.beginTransaction();
                 try {
@@ -61,10 +62,12 @@ public class InventoryDataSource {
                     Cursor c = database.query("Households", new String[]{"Version"}, "ID=?", new String[]{String.valueOf(householdID)}, null, null, null);
                     if (!c.moveToFirst()) {
                         c.close();
-                        pullInventoryStage(database, householdID);
+                        //pullInventoryStage(database, householdID);
+                        status = PersistenceResponseCode.ERR_DB_DATA_NOT_FOUND;
                         return;
                     }
                     long version = c.getLong(0);
+                    model = new JSONModels.LinkRequest(model.description, model.packageName, model.packageUnits, model.packageSize, version);
                     c.close();
 
                     //Try to link the UPC

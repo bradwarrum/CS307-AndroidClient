@@ -13,5 +13,5 @@ public enum PersistenceRequestCode {
     FETCH_LIST,
     COMMIT_CART,
     DELETE_LIST,
-    LINK_UPC,
+    LINK_UPC
 }
