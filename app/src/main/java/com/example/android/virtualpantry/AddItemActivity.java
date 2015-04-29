@@ -64,8 +64,6 @@ public class AddItemActivity extends UserActivity {
     private ListDataSource listDataSource;
     private InventoryDataSource invDataSource;
 
-    private LinkTask linkTask = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,10 +163,6 @@ public class AddItemActivity extends UserActivity {
 
 
     private void addItem(){
-        if(linkTask != null){
-            return;
-        }
-
         mBarcode.setError(null);
         mItemUserDescription.setError(null);
         mItemUnitCount.setError(null);
@@ -252,7 +246,6 @@ public class AddItemActivity extends UserActivity {
 
     @Override
     public void callback(PersistenceRequestCode request, PersistenceResponseCode status, Object returnValue, Type returnType) {
-        Toast.makeText(this, "Request finished", Toast.LENGTH_SHORT).show();
         super.callback(request, status, returnValue, returnType);
         if(status == PersistenceResponseCode.SUCCESS) {
             if (request == PersistenceRequestCode.LINK_UPC) {
@@ -351,6 +344,7 @@ public class AddItemActivity extends UserActivity {
         }
     }
 
+    /*
     private class LinkTask extends  AsyncTask<Void, Void, Integer>{
 
         private LinkRequest mLinkRequest;
@@ -436,7 +430,7 @@ public class AddItemActivity extends UserActivity {
                 Toast.makeText(AddItemActivity.this, "Unknown return code: " + result, Toast.LENGTH_SHORT).show();
             }
         }
-    }
+    }*/
 
     /*
     private class LinkAndAddItemTask extends AsyncTask<Void, Void, Integer>{

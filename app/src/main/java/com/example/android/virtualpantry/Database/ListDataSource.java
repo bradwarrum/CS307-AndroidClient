@@ -167,7 +167,7 @@ public class ListDataSource {
                                 params.put("ListID", listID);
                                 params.put("UPC", item.UPC);
                                 params.put("HouseholdID", householdID);
-                                if (-1 == database.insert("ShopppingListItems", null, params)) {
+                                if (-1 == database.insert("ShoppingListItems", null, params)) {
                                     status = PersistenceResponseCode.ERR_DB_INTERNAL;
                                     return;
                                 }
