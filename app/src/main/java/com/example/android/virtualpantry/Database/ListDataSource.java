@@ -328,7 +328,7 @@ public class ListDataSource {
                     }
 
                     c = database.rawQuery("SELECT I.PackageQuantity, I.PackageUnits, I.PackageName, I.Description, S.UPC, S.DefinedQuantity, S.DefinedFractional, S.CartQuantity, S.CartFractional "
-                            + "FROM ShoppingListItems S INNER JOIN InventoryItems I ON (S.UPC=I.UPC AND S.HouseholdID=S.UPC) "
+                            + "FROM ShoppingListItems S INNER JOIN InventoryItems I ON (S.UPC=I.UPC AND S.HouseholdID=I.HouseholdID) "
                             + "WHERE S.ListID=?;", new String[]{String.valueOf(listID)});
 
                     while (c.moveToNext()) {
