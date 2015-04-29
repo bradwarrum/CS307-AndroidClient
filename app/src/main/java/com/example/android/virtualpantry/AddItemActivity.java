@@ -2,31 +2,37 @@ package com.example.android.virtualpantry;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.virtualpantry.Data.JSONModels;
+import com.example.android.virtualpantry.Data.MeasurementUnit;
+import com.example.android.virtualpantry.Database.ListDataSource;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import com.example.android.virtualpantry.Data.JSONModels.LinkRequest;
+import com.example.android.virtualpantry.Data.JSONModels.UpdateListRequest.UpdateListItem;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class AddItemActivity extends ActionBarActivity {
+public class AddItemActivity extends UserActivity {
 
     private static final String LOG_TAG = "AddItemActivity";
 
@@ -40,21 +46,20 @@ public class AddItemActivity extends ActionBarActivity {
     private TextView mItemDescriptionText;
     private EditText mItemUserDescription;
     private EditText mItemUnitCount;
-    private EditText mItemFraction;
-    private EditText mItemUnitType;
+    private Spinner mItemUnitType;
     private Button mAddItemButton;
 
     private EditText mPackageName;
     private EditText mPackageSize;
 
-    private long mHouseholdID;
-    private long mListID;
-    private long mVersion;
+    private int mHouseholdID;
+    private int mListID;
+    private int mVersion;
     private int mMode;
 
+    private ListDataSource listDataSource;
 
-    private LinkAndAddItemTask mLinkAddItemTask = null;
-
+    private LinkTask linkTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,22 +72,22 @@ public class AddItemActivity extends ActionBarActivity {
         mItemDescriptionText = (TextView) findViewById(R.id.ItemDescriptionText);
         mItemUserDescription = (EditText) findViewById(R.id.UserItemDescription);
         mItemUnitCount = (EditText) findViewById(R.id.ItemUnitCount);
-        mItemFraction = (EditText) findViewById(R.id.ItemFraction);
-        mItemUnitType = (EditText) findViewById(R.id.ItemUnitType);
+        mItemUnitType = (Spinner) findViewById(R.id.ItemUnitType);
         mAddItemButton = (Button) findViewById(R.id.PushItemButton);
 
         mPackageName = (EditText) findViewById(R.id.ItemPackageName);
         mPackageSize = (EditText) findViewById(R.id.ItemPackageSize);
 
+        listDataSource = new ListDataSource(this);
 
         Intent myIntent = getIntent();
         if(myIntent.hasExtra("householdID")){
-            mHouseholdID = myIntent.getLongExtra("householdID", -1);
+            mHouseholdID = (int)myIntent.getLongExtra("householdID", -1);
         } else{
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
         }
         if(myIntent.hasExtra("listID")){
-            mListID = myIntent.getLongExtra("listID", -1);
+            mListID = (int)myIntent.getLongExtra("listID", -1);
         } else {
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
         }
@@ -92,10 +97,13 @@ public class AddItemActivity extends ActionBarActivity {
             Log.e(LOG_TAG, "Calling intent did not have a mode");
         }
         if(myIntent.hasExtra("version")){
-            mVersion = myIntent.getLongExtra("version", -1);
+            mVersion = (int)myIntent.getLongExtra("version", -1);
         } else {
             Log.e(LOG_TAG, "Calling intent did not have a mode");
         }
+
+        //populate spinner
+        mItemUnitType.setAdapter(new ArrayAdapter<MeasurementUnit>(this, android.R.layout.simple_spinner_item, MeasurementUnit.values()));
 
         //listeners
         mSwitchModeButton.setOnClickListener(new View.OnClickListener() {
@@ -104,7 +112,6 @@ public class AddItemActivity extends ActionBarActivity {
                 switchBarcodeMode();
             }
         });
-
         mScanBarcode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,25 +159,30 @@ public class AddItemActivity extends ActionBarActivity {
 
 
     private void addItem(){
-        Toast toast = Toast.makeText(this.getApplicationContext(), "Item added.", Toast.LENGTH_SHORT);
-        toast.show();
-        if(mLinkAddItemTask != null){
+        if(linkTask != null){
             return;
         }
 
         mBarcode.setError(null);
         mItemUserDescription.setError(null);
         mItemUnitCount.setError(null);
-        mItemFraction.setError(null);
-        mItemUnitType.setError(null);
+
 
         String barcodeText = mBarcode.getText().toString();
         String userDescription = mItemUserDescription.getText().toString();
         String unitCount = mItemUnitCount.getText().toString();
-        String unitFraction = mItemFraction.getText().toString();
-        String unitType = mItemUnitType.getText().toString();
+        int unitType = mItemUnitType.getSelectedItemPosition() + 1;
         String packageName = mPackageName.getText().toString();
         String packageSize = mPackageSize.getText().toString();
+
+        String quantity, fractional;
+        if(unitCount.contains(".")){
+            quantity = unitCount.split(".")[0];
+            fractional = unitCount.split(".")[1];
+        } else {
+            quantity = unitCount;
+            fractional = "0";
+        }
 
         if(mBarcodeSection.getVisibility() == View.GONE){
             barcodeText = null;
@@ -179,16 +191,6 @@ public class AddItemActivity extends ActionBarActivity {
         boolean cancel = false;
         View focusView = null;
 
-        /*if(TextUtils.isEmpty(unitType)){
-            mItemUnitType.setError("Cannot be empty");
-            focusView = mItemUnitType;
-            cancel = true;
-        }*/
-        if(TextUtils.isEmpty(unitFraction) || !isInt(unitFraction)){
-            mItemFraction.setError("Must be an integer value");
-            focusView = mItemFraction;
-            cancel = true;
-        }
         if(TextUtils.isEmpty(unitCount) || !isInt(unitCount)){
             mItemUnitCount.setError("Must be an integer value");
             focusView = mItemUnitCount;
@@ -220,18 +222,19 @@ public class AddItemActivity extends ActionBarActivity {
             String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                     .getString(PreferencesHelper.TOKEN, null);
             if(token == null){
-                Intent intent = new Intent(this, LoginRegisterActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
+                cancelToLoginPage();
             }
-           mLinkAddItemTask = new LinkAndAddItemTask(barcodeText, userDescription,
+            UpdateListItem listItem = new UpdateListItem(barcodeText, Integer.valueOf(quantity), Integer.valueOf(fractional));
+            LinkRequest linkRequest = new LinkRequest(userDescription, packageName, unitType, Integer.valueOf(packageSize));
+            linkTask = new LinkTask(barcodeText, linkRequest, listItem, token, mMode);
+            linkTask.execute((Void) null);
+            /*mLinkAddItemTask = new LinkAndAddItemTask(barcodeText, userDescription,
                    packageName, new Float(packageSize),
                    new Integer(unitCount), new Integer(unitFraction),
                    14, mHouseholdID,
                    mVersion, mListID,
                    token, mMode);
-            mLinkAddItemTask.execute((Void) null);
+                mLinkAddItemTask.execute((Void) null);*/
         }
     }
 
@@ -254,6 +257,8 @@ public class AddItemActivity extends ActionBarActivity {
     }
 
     private void itemAdded(){
+        Toast toast = Toast.makeText(this.getApplicationContext(), "Item added.", Toast.LENGTH_SHORT);
+        toast.show();
         finish();
     }
 
@@ -295,6 +300,88 @@ public class AddItemActivity extends ActionBarActivity {
         }
     }
 
+    private class LinkTask extends  AsyncTask<Void, Void, Integer>{
+
+        private LinkRequest mLinkRequest;
+        private Request mRequest;
+        private String mToken;
+        private String mUPC;
+        private Request request;
+        private int mMode;
+        private UpdateListItem mListItem;
+
+        public LinkTask(String UPC, LinkRequest linkRequest, UpdateListItem listItem, String token, int mode) {
+            mLinkRequest = linkRequest;
+            mUPC = UPC;
+            mToken = token;
+            mMode = mode;
+            mListItem = listItem;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            if (mUPC != null) {
+                request = new Request(
+                        NetworkUtility.createLinkUPCString(mHouseholdID, mUPC, mToken),
+                        Request.POST,
+                        mRequest.toString()
+                );
+            } else {
+                request = new Request(
+                        NetworkUtility.createLinkNoUPCString(mHouseholdID, mToken),
+                        Request.POST,
+                        mRequest.toString()
+                );
+            }
+            if(request.openConnection()){
+                request.execute();
+                if(request.getResponseCode() <400 && request.getResponseCode() >= 200) {
+                    if (mUPC == null) {
+                        mUPC = JSONModels.gson.fromJson(request.getResponse(), JSONModels.CreateUPCResponse.class).UPC;
+                    }
+                    if (mMode == LIST_MODE) {
+                        List<UpdateListItem> updateRequestList = new ArrayList<>();
+                        updateRequestList.add(mListItem);
+                        listDataSource.updateList(mListID, updateRequestList, AddItemActivity.this);
+                    } else {
+                        //INVENTORY MODE
+                        List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> items = new ArrayList<>();
+                        items.add(new JSONModels.UpdateInventoryRequest.UpdateInventoryItem(mUPC, mListItem.quantity, mListItem.fractional));
+                        JSONModels.UpdateInventoryRequest updateJSON = new JSONModels.UpdateInventoryRequest(mVersion, items);
+                        request = new Request(
+                                NetworkUtility.createUpdateInventoryString(mHouseholdID, mToken),
+                                Request.POST,
+                                updateJSON
+                        );
+                        if(request.openConnection()){
+                            request.execute();
+                            return request.getResponseCode();
+                        } else {
+                            Log.e(LOG_TAG, "Unable to open connection");
+                            return -1;
+                        }
+                    }
+                }else{
+                    Toast.makeText(AddItemActivity.this, "Error in linking item", Toast.LENGTH_SHORT).show();
+                }
+            }
+            return -1;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            linkTask = null;
+            if(result == -1){
+                Toast.makeText(AddItemActivity.this, "Error in adding item", Toast.LENGTH_SHORT).show();
+            } else if (result == 200){
+                itemAdded();
+            } else {
+                Toast.makeText(AddItemActivity.this, "Error in adding item", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    /*
     private class LinkAndAddItemTask extends AsyncTask<Void, Void, Integer>{
 
         private static final String LOG_TAG = "LinkAndAddItemTask";
@@ -426,5 +513,5 @@ public class AddItemActivity extends ActionBarActivity {
                     break;
             }
         }
-    }
+    }*/
 }

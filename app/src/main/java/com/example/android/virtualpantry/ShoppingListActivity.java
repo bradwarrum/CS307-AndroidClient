@@ -19,10 +19,15 @@ import android.widget.TextView;
 
 import com.example.android.virtualpantry.Data.JSONModels;
 import com.example.android.virtualpantry.Database.ListDataSource;
+import com.example.android.virtualpantry.Database.PersistenceRequestCode;
+import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
 
+import com.example.android.virtualpantry.Data.JSONModels.UpdateListRequest.UpdateListItem;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,8 +88,27 @@ public class ShoppingListActivity extends UserActivity {
         //new GetListTask(mHouseholdID, mListID, token).execute((Void) null);
     }
 
-    private void updateDisplay(String response){
-        mShoppingListJSON = JSONModels.gson.fromJson(response, JSONModels.GetShoppingListResponse.class);
+    @Override
+    public void callback(PersistenceRequestCode request, PersistenceResponseCode status, Object returnValue, Type returnType) {
+        super.callback(request, status, returnValue, returnType);
+        if(status == PersistenceResponseCode.SUCCESS){
+            switch(request){
+                case UPDATE_LIST:
+                    if(returnType == JSONModels.GetShoppingListResponse.class) {
+                        JSONModels.GetShoppingListResponse shoppingListResponse = (JSONModels.GetShoppingListResponse) returnValue;
+                        updateDisplay(shoppingListResponse);
+                    } else {
+                        Log.e(LOG_TAG, "Error wrong return type: " + returnType);
+                    }
+                    break;
+                default:
+                    Log.e(LOG_TAG, "Unknown database request callback: " + request + ", " + status);
+            }
+        }
+    }
+
+    private void updateDisplay(JSONModels.GetShoppingListResponse response){
+        mShoppingListJSON = response;
         mHeader.setText(mShoppingListJSON.name);
         mVersion.setText(new Long(mShoppingListJSON.version).toString());
         mListData = new ArrayList<Map<String, String>>();
@@ -159,7 +183,16 @@ public class ShoppingListActivity extends UserActivity {
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateQuantity(position, newQuantity.getText().toString());
+                String quantity, fraction;
+                String value = newQuantity.getText().toString();
+                if(value.contains(".")){
+                    quantity = value.split(".")[0];
+                    fraction = value.split(".")[1];
+                } else {
+                    quantity = value;
+                    fraction = "0";
+                }
+                updateQuantity(position, quantity, fraction);
                 dialog.cancel();
             }
         });
@@ -175,32 +208,34 @@ public class ShoppingListActivity extends UserActivity {
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            cancelToLoginPage();
         }
-        new UpdateListQuantityTask(mHouseholdID, mShoppingListJSON.version,
+        UpdateListItem updateItem = new UpdateListItem(mShoppingListJSON.items.get(position).UPC, 0, 0);
+        List<UpdateListItem> updateList = new ArrayList<>();
+        updateList.add(updateItem);
+        listDataSource.updateList(mListID, updateList, this);
+        /*new UpdateListQuantityTask(mHouseholdID, mShoppingListJSON.version,
                 mShoppingListJSON.items.get(position).UPC,
                 0,
                 0,
-                token).execute((Void) null);
+                token).execute((Void) null);*/
     }
 
-    private void updateQuantity(int position, String quantity){
+    private void updateQuantity(int position, String quantity, String fractional){
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            cancelToLoginPage();
         }
-        new UpdateListQuantityTask(mHouseholdID, mShoppingListJSON.version,
+        UpdateListItem updateItem = new UpdateListItem(mShoppingListJSON.items.get(position).UPC, new Integer(quantity).intValue(), new Integer(fractional).intValue());
+        List<UpdateListItem> updateList = new ArrayList<>();
+        updateList.add(updateItem);
+        listDataSource.updateList(mListID, updateList, this);
+        /*new UpdateListQuantityTask(mHouseholdID, mShoppingListJSON.version,
                 mShoppingListJSON.items.get(position).UPC,
                 new Integer(quantity).intValue(),
                 mShoppingListJSON.items.get(position).fractional,
-                token).execute((Void) null);
+                token).execute((Void) null);*/
     }
 
 
