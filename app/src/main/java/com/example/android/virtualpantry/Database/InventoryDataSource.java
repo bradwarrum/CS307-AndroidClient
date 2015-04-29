@@ -84,7 +84,7 @@ public class InventoryDataSource {
                         if (request.getResponseCode() == 200) {
                             JSONModels.CreateUPCResponse resp = parseWebResponse(request, JSONModels.CreateUPCResponse.class);
                             if (resp == null) return;
-                            linkStage(database, model, resp.version);
+                            linkStage(database, model, resp.version, resp.UPC);
                         } else {
                             parseWebResponse(request, JSONModels.ErrorResponse.class);
                             if (status == PersistenceResponseCode.ERR_OUTDATED_TIMESTAMP) {
@@ -140,7 +140,7 @@ public class InventoryDataSource {
                     request.execute();
                     JSONModels.CreateUPCResponse resp = parseWebResponse(request, JSONModels.CreateUPCResponse.class);
                     if (resp == null) return;
-                    linkStage(database, model, resp.version);
+                    linkStage(database, model, resp.version, resp.UPC);
 
                 } else {
                     status = PersistenceResponseCode.ERR_CLIENT_CONNECT;
@@ -148,10 +148,10 @@ public class InventoryDataSource {
                 }
             }
 
-            private void linkStage(SQLiteDatabase database, JSONModels.LinkRequest model, long newVersion) {
+            private void linkStage(SQLiteDatabase database, JSONModels.LinkRequest model, long newVersion, String finalUPC) {
                 ContentValues params = new ContentValues();
                 params.put("HouseholdID", householdID);
-                params.put("UPC", UPC);
+                params.put("UPC", finalUPC);
                 params.put("Description", model.description);
                 params.put("PackageQuantity", model.packageSize);
                 params.put("PackageUnits", model.packageUnits);
@@ -168,7 +168,7 @@ public class InventoryDataSource {
                         status = PersistenceResponseCode.ERR_DB_INTERNAL;
                         return;
                     }
-                    returnValue = UPC;
+                    returnValue = finalUPC;
                     returnType = String.class;
                     database.setTransactionSuccessful();
                 }
