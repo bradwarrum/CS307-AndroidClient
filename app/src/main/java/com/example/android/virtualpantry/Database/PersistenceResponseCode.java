@@ -27,11 +27,13 @@ public enum PersistenceResponseCode {
     ERR_UPC_CHECKSUM_INVALID(14),
     ERR_INSUFFICIENT_PERMISSIONS(15),
     ERR_OUTDATED_TIMESTAMP(16),
+    ERR_RECIPE_NOT_FOUND(17),
+    ERR_ITEM_DUPLICATE_FOUND(18),
     ERR_DB_DATA_NOT_FOUND(Integer.MAX_VALUE - 1),
     ERR_SERVER_MALFORMED_RESPONSE(Integer.MAX_VALUE);
 
     private static final int SERVER_BLOCK_START = 3;
-    private static final int SERVER_BLOCK_END = 16;
+    private static final int SERVER_BLOCK_END = 18;
     private static PersistenceResponseCode[] values = PersistenceResponseCode.values();
 
     private final int code;

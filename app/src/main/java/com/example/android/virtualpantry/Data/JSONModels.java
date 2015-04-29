@@ -220,20 +220,24 @@ public class JSONModels {
         public final String packageName;
         public final int packageUnits;
         public final float packageSize;
+        public final long version;
 
-        public LinkRequest(String description, String packageName, int packageUnits, float packageSize) {
+        public LinkRequest(String description, String packageName, int packageUnits, float packageSize, long version) {
             this.description = description;
             this.packageName = packageName;
             this.packageUnits = packageUnits;
             this.packageSize = packageSize;
+            this.version = version;
         }
     }
 
     public static class CreateUPCResponse {
         public final String UPC;
+        public final long version;
 
-        public CreateUPCResponse(String UPC){
+        public CreateUPCResponse(String UPC, long version){
             this.UPC = UPC;
+            this.version = version;
         }
     }
 
