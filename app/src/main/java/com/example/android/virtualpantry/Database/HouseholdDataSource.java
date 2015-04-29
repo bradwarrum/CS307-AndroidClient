@@ -233,6 +233,7 @@ public class HouseholdDataSource {
                                 params.put("Name", list.listName);
                                 if (1 != database.update("ShoppingLists", params, "ListID=?", new String[]{String.valueOf(list.listID)})) {
                                     params.put("ListID", list.listID);
+                                    params.put("HouseholdID", householdID);
                                     if (-1 == database.insert("ShoppingLists", null, params)) {
                                         status = PersistenceResponseCode.ERR_DB_INTERNAL;
                                         return;

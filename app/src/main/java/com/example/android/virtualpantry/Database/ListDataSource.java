@@ -274,7 +274,7 @@ public class ListDataSource {
                     String name = c.getString(0);
                     long version = c.getLong(1);
                     c.close();
-                    c = database.rawQuery("SELECT (I.PackageQuantity, I.PackageUnits, I.PackageName, I.Description, S.UPC, S.Quantity, S.Fractional, S.CartQuantity, S.CartFractional) "
+                    c = database.rawQuery("SELECT I.PackageQuantity, I.PackageUnits, I.PackageName, I.Description, S.UPC, S.Quantity, S.Fractional, S.CartQuantity, S.CartFractional "
                             + "FROM ShoppingListItems S INNER JOIN InventoryItems I ON (S.UPC=I.UPC AND S.HouseholdID=S.UPC) "
                             + "WHERE S.ListID=? AND S.CartQuantity>0 AND S.CartFractional>0;", new String[]{String.valueOf(listID)});
 
@@ -327,7 +327,7 @@ public class ListDataSource {
                         else if (status != PersistenceResponseCode.ERR_CLIENT_CONNECT) return;
                     }
 
-                    c = database.rawQuery("SELECT (I.PackageQuantity, I.PackageUnits, I.PackageName, I.Description, S.UPC, S.Quantity, S.Fractional, S.CartQuantity, S.CartFractional) "
+                    c = database.rawQuery("SELECT I.PackageQuantity, I.PackageUnits, I.PackageName, I.Description, S.UPC, S.Quantity, S.Fractional, S.CartQuantity, S.CartFractional "
                             + "FROM ShoppingListItems S INNER JOIN InventoryItems I ON (S.UPC=I.UPC AND S.HouseholdID=S.UPC) "
                             + "WHERE S.ListID=?;", new String[]{String.valueOf(listID)});
 
@@ -374,7 +374,7 @@ public class ListDataSource {
                     long version = c.getLong(0);
                     c.close();
 
-                    c = database.rawQuery("SELECT (S.UPC, S.CartQuantity, S.CartFractional, I.Quantity, I.Fractional) FROM ShoppingListItems S INNER JOIN InventoryItems I ON (I.UPC = S.UPC AND I.HouseholdID = S.HouseholdID) "
+                    c = database.rawQuery("SELECT S.UPC, S.CartQuantity, S.CartFractional, I.Quantity, I.Fractional FROM ShoppingListItems S INNER JOIN InventoryItems I ON (I.UPC = S.UPC AND I.HouseholdID = S.HouseholdID) "
                             + "WHERE (S.ListID = ? AND S.CartQuantity>0 AND S.CartFractional>0);", new String[]{String.valueOf(listID)});
                     if (!c.moveToFirst()) {
                         status = PersistenceResponseCode.ERR_DB_DATA_NOT_FOUND;
