@@ -8,7 +8,7 @@ import android.util.Log;
 /**
  * Created by Brad on 4/19/2015.
  */
-class VPDatabaseHandler extends SQLiteOpenHelper {
+public class VPDatabaseHandler extends SQLiteOpenHelper {
 
 
     private static final int VP_SCHEMA_VERSION = 4;

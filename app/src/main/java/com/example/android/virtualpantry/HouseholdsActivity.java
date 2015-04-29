@@ -1,6 +1,7 @@
 package com.example.android.virtualpantry;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import com.example.android.virtualpantry.Database.PersistenceCallback;
 import com.example.android.virtualpantry.Database.PersistenceRequestCode;
 import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
+import com.example.android.virtualpantry.Database.VPDatabaseHandler;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
 
@@ -34,6 +36,7 @@ import java.util.Map;
 public class HouseholdsActivity extends UserActivity implements PersistenceCallback{
 
     private Button mCreateHouseholdButton;
+    private Button mLogoutButton;
     private ListView mHouseholdsList;
     private TextView mSubHeader;
 
@@ -54,12 +57,28 @@ public class HouseholdsActivity extends UserActivity implements PersistenceCallb
         mCreateHouseholdButton = (Button) findViewById(R.id.CreateHouseholdButton);
         mHouseholdsList = (ListView) findViewById(R.id.HouseholdsList);
         mSubHeader = (TextView) findViewById(R.id.HouseholdsSubHeader);
+        mLogoutButton = (Button) findViewById(R.id.HouseholdsLogoutButton);
         //event listeners
         mCreateHouseholdButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 Intent intent = new Intent(HouseholdsActivity.this, CreateHouseholdActivity.class);
                 startActivity(intent);
+            }
+        });
+        mLogoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VPDatabaseHandler.purgeInfo(HouseholdsActivity.this);
+                SharedPreferences user_info = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE);
+                SharedPreferences.Editor editor = user_info.edit();
+                editor.putString(PreferencesHelper.USERNAME, PreferencesHelper.NULL_PREFERENCE_VALUE);
+                editor.putString(PreferencesHelper.PASSWORD, PreferencesHelper.NULL_PREFERENCE_VALUE);
+                editor.putString(PreferencesHelper.TOKEN, PreferencesHelper.TOKEN);
+                editor.commit();
+                Intent intent = new Intent(HouseholdsActivity.this, LoginRegisterActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
         //data holding
