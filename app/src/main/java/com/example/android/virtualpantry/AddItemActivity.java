@@ -252,6 +252,7 @@ public class AddItemActivity extends UserActivity {
 
     @Override
     public void callback(PersistenceRequestCode request, PersistenceResponseCode status, Object returnValue, Type returnType) {
+        Toast.makeText(this, "Request finished", Toast.LENGTH_SHORT).show();
         super.callback(request, status, returnValue, returnType);
         if(status == PersistenceResponseCode.SUCCESS) {
             if (request == PersistenceRequestCode.LINK_UPC) {
