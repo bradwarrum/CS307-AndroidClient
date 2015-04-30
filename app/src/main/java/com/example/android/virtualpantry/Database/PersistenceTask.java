@@ -176,7 +176,7 @@ public abstract class PersistenceTask extends AsyncTask<Void, Void, Void> {
                     }
                 }
             }
-            database.delete("ShoppingLists", "Orphaned=1", null);
+            database.delete("ShoppingListItems", "Orphaned=1", null);
             params.clear();
             params.put("Version", listresp.version);
             version = listresp.version;

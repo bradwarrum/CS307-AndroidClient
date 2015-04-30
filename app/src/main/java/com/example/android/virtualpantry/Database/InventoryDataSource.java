@@ -198,6 +198,7 @@ public class InventoryDataSource {
         PersistenceTask task = new PersistenceTask(callback) {
             @Override
             protected void doInBackground() {
+                requestType = PersistenceRequestCode.FETCH_INVENTORY;
                 SQLiteDatabase database = dbHandler.getWritableDatabase();
                 database.beginTransaction();
                 try {
@@ -269,6 +270,7 @@ public class InventoryDataSource {
         PersistenceTask task = new PersistenceTask(callback) {
             @Override
             protected void doInBackground() {
+                requestType = PersistenceRequestCode.UPDATE_INVENTORY;
                 SQLiteDatabase database = dbHandler.getWritableDatabase();
                 database.beginTransaction();
                 try {
