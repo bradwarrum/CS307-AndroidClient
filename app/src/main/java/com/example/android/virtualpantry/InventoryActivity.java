@@ -19,17 +19,23 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.virtualpantry.Data.JSONModels;
 import com.example.android.virtualpantry.Database.HouseholdDataSource;
 import com.example.android.virtualpantry.Database.InventoryDataSource;
 import com.example.android.virtualpantry.Database.ListDataSource;
+import com.example.android.virtualpantry.Database.PersistenceRequestCode;
+import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
 
 import com.example.android.virtualpantry.Data.JSONModels.UpdateInventoryRequest.UpdateInventoryItem;
+import com.example.android.virtualpantry.Data.JSONModels.GetInventoryResponse.InventoryItem;
+import com.example.android.virtualpantry.Data.JSONModels.UpdateListRequest.UpdateListItem;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +50,8 @@ public class InventoryActivity extends UserActivity {
     private ListView mInventory;
     private int mHouseholdID;
 
-    private JSONModels.GetInventoryResponse mInventoryJSON;
+    //private JSONModels.GetInventoryResponse mInventoryJSON;
+    private List<InventoryItem> mInventoryItems;
     private JSONModels.Household mHousehold;
 
     private String householdName;
@@ -100,20 +107,45 @@ public class InventoryActivity extends UserActivity {
         new GetHouseholdInfoTask(mHouseholdID, token).execute((Void) null);*/
     }
 
-    private void updateDisplay(String response){
-        mInventoryJSON = JSONModels.gson.fromJson(response, JSONModels.GetInventoryResponse.class);
-        mVersion.setText(new Long(mInventoryJSON.version).toString());
+    @Override
+    public void callback(PersistenceRequestCode request, PersistenceResponseCode status, Object returnValue, Type returnType) {
+        super.callback(request, status, returnValue, returnType);
+        if(status == PersistenceResponseCode.SUCCESS){
+            switch(request){
+                case FETCH_INVENTORY:
+                    List<InventoryItem> inventoryItems = (List<InventoryItem>) returnValue;
+                    updateDisplay(inventoryItems);
+                    break;
+                case UPDATE_INVENTORY:
+                    invDataSource.getInventory(mHouseholdID, true, this);
+                    break;
+                case UPDATE_LIST:
+                    invDataSource.getInventory(mHouseholdID, true, this);
+                    break;
+                case FETCH_HOUSEHOLD:
+                    mHousehold = (JSONModels.Household) returnValue;
+                    break;
+                default:
+                    Toast.makeText(this, "Unknown callback: " + request + " result in " + status, Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(this, "Error in data access of " + request + " result in " + status, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void updateDisplay(List<InventoryItem> inventoryItems){
+        mInventoryItems = inventoryItems;
         mInventoryData = new ArrayList<Map<String, String>>();
         List<JSONModels.GetInventoryResponse.InventoryItem> emptyItems = new ArrayList<>();
-        for(JSONModels.GetInventoryResponse.InventoryItem item : mInventoryJSON.items){
+        for(JSONModels.GetInventoryResponse.InventoryItem item : inventoryItems){
             if(item.quantity == 0){
                 emptyItems.add(item);
             }
         }
         for(JSONModels.GetInventoryResponse.InventoryItem item : emptyItems){
-            mInventoryJSON.items.remove(item);
+            inventoryItems.remove(item);
         }
-        for(JSONModels.GetInventoryResponse.InventoryItem item : mInventoryJSON.items){
+        for(JSONModels.GetInventoryResponse.InventoryItem item : inventoryItems){
             Map<String, String> inventoryItem = new HashMap<>(2);
             inventoryItem.put("itemName", item.description);
             String subtitle = "";
@@ -136,7 +168,6 @@ public class InventoryActivity extends UserActivity {
                 Intent intent = new Intent(InventoryActivity.this, AddItemActivity.class);
                 intent.putExtra("householdID", mHouseholdID);
                 intent.putExtra("mode", AddItemActivity.INVENTORY_MODE);
-                intent.putExtra("version", new Long(mInventoryJSON.version).longValue());
                 startActivity(intent);
             }
         });
@@ -169,8 +200,8 @@ public class InventoryActivity extends UserActivity {
         cancelButton = (Button) dialog.findViewById(R.id.InventoryItemCancelButton);
 
         //setreactions
-        ((TextView) dialog.findViewById(R.id.InventoryItemDialogTitle)).setText(mInventoryJSON.items.get(position).description);
-        newQuantity.setText(String.valueOf(mInventoryJSON.items.get(position).quantity));
+        ((TextView) dialog.findViewById(R.id.InventoryItemDialogTitle)).setText(mInventoryItems.get(position).description);
+        newQuantity.setText(String.valueOf(mInventoryItems.get(position).quantity));
         removeItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -181,7 +212,7 @@ public class InventoryActivity extends UserActivity {
         addToListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveItem(mInventoryJSON.items.get(position).UPC, Integer.valueOf(newQuantity.getText().toString()));
+                moveItem(mInventoryItems.get(position).UPC, newQuantity.getText().toString());
                 dialog.cancel();
             }
         });
@@ -215,14 +246,10 @@ public class InventoryActivity extends UserActivity {
             quantity = totalQuantity;
             fractional = "0";
         }
-        UpdateInventoryItem updateInventoryItem = new UpdateInventoryItem(mInventoryJSON.items.get(position).UPC, Integer.valueOf(quantity), Integer.valueOf(fractional));
+        UpdateInventoryItem updateInventoryItem = new UpdateInventoryItem(mInventoryItems.get(position).UPC, Integer.valueOf(quantity), Integer.valueOf(fractional));
         List<UpdateInventoryItem> updateList = new ArrayList<>();
+        updateList.add(updateInventoryItem);
         invDataSource.updateInventoryQuantity(mHouseholdID, updateList, this);
-        /*new UpdateInventoryQuantityTask(mHouseholdID, mInventoryJSON.version,
-                mInventoryJSON.items.get(position).UPC,
-                new Integer(quantity).intValue(),
-                mInventoryJSON.items.get(position).fractional,
-                 token).execute((Void) null);*/
     }
 
     private void removeItem(int position){
@@ -231,17 +258,12 @@ public class InventoryActivity extends UserActivity {
         if(token == null){
             cancelToLoginPage();
         }
-        UpdateInventoryItem updateInventoryItem = new UpdateInventoryItem(mInventoryJSON.items.get(position).UPC, 0, 0);
+        UpdateInventoryItem updateInventoryItem = new UpdateInventoryItem(mInventoryItems.get(position).UPC, 0, 0);
         List<UpdateInventoryItem> updateList = new ArrayList<>();
         invDataSource.updateInventoryQuantity(mHouseholdID, updateList, this);
-        /*new UpdateInventoryQuantityTask(mHouseholdID, mInventoryJSON.version,
-                mInventoryJSON.items.get(position).UPC,
-                0,
-                mInventoryJSON.items.get(position).fractional,
-                token).execute((Void) null);*/
     }
 
-    private void moveItem(final String UPC, final int quantity){
+    private void moveItem(final String UPC, final String quantity){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Move Item to Shopping list");
         final Spinner spinner = new Spinner(this);
@@ -270,16 +292,24 @@ public class InventoryActivity extends UserActivity {
         builder.show();
     }
 
-    private void moveItemToList(String UPC, int quantity, int listID){
+    private void moveItemToList(String UPC, String totalQuantity, int listID){
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            cancelToLoginPage();
         }
-        listDataSource.getListItems(mHouseholdID, listID, true, this);
+        String quantity, fractional;
+        if(totalQuantity.contains(".")){
+            quantity = totalQuantity.split(".")[0];
+            fractional = totalQuantity.split(".")[1];
+        } else {
+            quantity = totalQuantity;
+            fractional = "0";
+        }
+        List<UpdateListItem> updateList = new ArrayList<>();
+        updateList.add(new UpdateListItem(UPC, Integer.valueOf(quantity), Integer.valueOf(fractional)));
+        listDataSource.updateList(listID, updateList, this);
+        //listDataSource.getListItems(mHouseholdID, listID, true, this);
         //new GetListTask(mHouseholdID, listID, UPC, quantity, token).execute((Void) null);
     }
 

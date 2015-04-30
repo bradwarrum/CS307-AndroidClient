@@ -341,6 +341,8 @@ public class AddItemActivity extends UserActivity {
                 }
             } else if (request == PersistenceRequestCode.UPDATE_LIST){
                 itemAdded();
+            } else if(request == PersistenceRequestCode.UPDATE_INVENTORY){
+                itemAdded();
             }
         } else {
             Toast.makeText(this, "Error in data access of " + request + " result in " + status, Toast.LENGTH_LONG).show();
