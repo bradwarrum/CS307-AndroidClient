@@ -247,7 +247,7 @@ public class ListDataSource {
                 try {
                     params.put("CartQuantity", quantity);
                     params.put("CartFractional", fractional);
-                    if (1 != database.update("ShoppingListItems", params, "HouseholdID=? AND ListID=? AND UPC=? AND Orphaned=0", new String[]{String.valueOf(householdID), String.valueOf(listID), UPC})) {
+                    if (1 != database.update("ShoppingListItems", params, "HouseholdID=? AND ListID=? AND UPC=?", new String[]{String.valueOf(householdID), String.valueOf(listID), UPC})) {
                         status = PersistenceResponseCode.ERR_DB_DATA_NOT_FOUND;
                     }
                 } finally {
@@ -283,14 +283,14 @@ public class ListDataSource {
                     long version = c.getLong(1);
                     c.close();
                     c = database.rawQuery("SELECT I.PackageQuantity, I.PackageUnits, I.PackageName, I.Description, S.UPC, S.DefinedQuantity, S.DefinedFractional, S.CartQuantity, S.CartFractional "
-                            + "FROM ShoppingListItems S INNER JOIN InventoryItems I ON (S.UPC=I.UPC AND S.HouseholdID=S.UPC) "
-                            + "WHERE S.ListID=? AND S.CartQuantity>0 AND S.CartFractional>0;", new String[]{String.valueOf(listID)});
+                            + "FROM ShoppingListItems S INNER JOIN InventoryItems I ON (S.UPC=I.UPC AND S.HouseholdID=I.HouseholdID) "
+                            + "WHERE S.ListID=? AND (S.CartQuantity>0 OR S.CartFractional>0);", new String[]{String.valueOf(listID)});
 
                     while (c.moveToNext()) {
                         int unitID = c.getInt(1);
                         UnitTypes t = UnitTypes.fromID(unitID);
                         JSONModels.GetShoppingListResponse.Item.ListItemPackaging packaging = new JSONModels.GetShoppingListResponse.Item.ListItemPackaging(c.getFloat(0), unitID, t.getUnitName(), t.getUnitAbbrev(), c.getString(2));
-                        JSONModels.GetShoppingListResponse.Item item = new JSONModels.GetShoppingListResponse.Item(c.getString(4), c.getString(3), c.getInt(5), c.getInt(6), c.getInt(7), c.getInt(8), packaging);
+                        JSONModels.GetShoppingListResponse.Item item = new JSONModels.GetShoppingListResponse.Item(c.getString(4), c.getString(3), c.getInt(5), c.getInt(7), c.getInt(8), c.getInt(6), packaging);
                         items.add(item);
                     }
                     c.close();
