@@ -35,6 +35,8 @@ import com.google.zxing.integration.android.IntentResult;
 import com.example.android.virtualpantry.Data.JSONModels.LinkRequest;
 import com.example.android.virtualpantry.Data.JSONModels.UpdateListRequest.UpdateListItem;
 
+import org.w3c.dom.Text;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +58,8 @@ public class AddItemActivity extends UserActivity {
     private Spinner mItemUnitType;
     private Button mAddItemButton;
     private TextView mPackagePreview;
+    private Button mProduceButton;
+    private Button mMeatButton;
 
     private EditText mPackageName;
     private EditText mPackageSize;
@@ -81,6 +85,8 @@ public class AddItemActivity extends UserActivity {
         mItemUnitType = (Spinner) findViewById(R.id.ItemUnitType);
         mAddItemButton = (Button) findViewById(R.id.PushItemButton);
         mPackagePreview = (TextView) findViewById(R.id.PackagingPreview);
+        mMeatButton = (Button) findViewById(R.id.MeatButton);
+        mProduceButton = (Button) findViewById(R.id.ProduceButton);
 
         mPackageName = (EditText) findViewById(R.id.ItemPackageName);
         mPackageSize = (EditText) findViewById(R.id.ItemPackageSize);
@@ -147,7 +153,29 @@ public class AddItemActivity extends UserActivity {
 
             }
         });
+        mMeatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                meatUpdate();
+            }
+        });
+        mProduceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                produceUpdate();
+            }
+        });
+    }
 
+    private void meatUpdate(){
+        mPackageName.setText(mItemUserDescription.getText().toString());
+        mItemUnitType.setSelection(0);
+    }
+
+    private void produceUpdate(){
+        mPackageName.setText(mItemUserDescription.getText().toString());
+        mItemUnitType.setSelection(13);
+        mPackageSize.setText("1");
     }
 
     private TextWatcher twatch = new TextWatcher() {
