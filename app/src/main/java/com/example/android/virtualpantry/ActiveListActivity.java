@@ -157,7 +157,7 @@ public class ActiveListActivity extends UserActivity {
                     }
                     break;
                 case UPDATE_CART:
-                    listDataSource.getListItems(mHouseholdID, mListID, false, this);
+                    listDataSource.getCartItems(mListID, this);
                     break;
                 default:
                     Toast.makeText(this, "Unknown callback" + request + " result in " + status, Toast.LENGTH_LONG).show();
