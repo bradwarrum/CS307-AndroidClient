@@ -191,8 +191,16 @@ public class ActiveListActivity extends UserActivity {
             Map<String, String> listItem = new HashMap<>(2);
             listItem.put("itemName", item.description);
             String subtitle = "";
-            subtitle += "UPC:" + item.UPC + " - " + item.quantity;
-            subtitle += " " +  item.packaging.packageName;
+            if(item.UPC.length() != 5) {
+                subtitle += "UPC:" + item.UPC + " - ";
+            }
+            subtitle += item.quantity;
+            if(item.fractional != 0){
+                subtitle += "." + item.fractional;
+            }
+            subtitle += " (" + item.packaging.packageSize;
+            subtitle += " " + item.packaging.unitAbbreviation;
+            subtitle += " " + item.packaging.packageName + ")";
             listItem.put("info", subtitle);
             mListData.add(listItem);
         }
@@ -200,8 +208,16 @@ public class ActiveListActivity extends UserActivity {
             Map<String, String> listItem = new HashMap<>(2);
             listItem.put("itemName", item.description);
             String subtitle = "";
-            subtitle += "UPC:" + item.UPC + " - " + item.quantity;
-            subtitle += " " +  item.packaging.packageName;
+            if(item.UPC.length() != 5) {
+                subtitle += "UPC:" + item.UPC + " - ";
+            }
+            subtitle += item.quantity;
+            if(item.fractional != 0){
+                subtitle += "." + item.fractional;
+            }
+            subtitle += " (" + item.packaging.packageSize;
+            subtitle += " " + item.packaging.unitAbbreviation;
+            subtitle += " " + item.packaging.packageName + ")";
             listItem.put("info", subtitle);
             mCartData.add(listItem);
         }

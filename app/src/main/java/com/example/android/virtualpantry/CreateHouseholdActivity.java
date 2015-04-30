@@ -1,10 +1,7 @@
 package com.example.android.virtualpantry;
 
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,21 +9,18 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.android.virtualpantry.Data.JSONModels;
 import com.example.android.virtualpantry.Database.HouseholdDataSource;
 import com.example.android.virtualpantry.Database.PersistenceCallback;
 import com.example.android.virtualpantry.Database.PersistenceRequestCode;
 import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
-import com.example.android.virtualpantry.Network.NetworkUtility;
-import com.example.android.virtualpantry.Network.Request;
 
 import java.lang.reflect.Type;
 
 
-public class CreateHouseholdActivity extends ActionBarActivity {
+public class CreateHouseholdActivity extends UserActivity {
 
-    private Button mCreateHouseholButton;
+    private Button mCreateHouseholdButton;
     private AutoCompleteTextView mHouseholdName;
     private AutoCompleteTextView mHouseholdDescription;
     private TextView mStatusText;
@@ -47,12 +41,12 @@ public class CreateHouseholdActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_household);
-        mCreateHouseholButton = (Button) findViewById(R.id.CreateHouseActionButton);
+        mCreateHouseholdButton = (Button) findViewById(R.id.CreateHouseActionButton);
         mHouseholdName = (AutoCompleteTextView) findViewById(R.id.CreateHouseholdNameText);
         mHouseholdDescription = (AutoCompleteTextView) findViewById(R.id.CreateHouseholdDescriptionText);
         mStatusText = (TextView) findViewById(R.id.CreateHouseholdStatusMessage);
 
-        mCreateHouseholButton.setOnClickListener(new View.OnClickListener() {
+        mCreateHouseholdButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 createHousehold();
@@ -98,6 +92,7 @@ public class CreateHouseholdActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_create_household, menu);
+        super.onCreateOptionsMenu(menu);
         return true;
     }
 

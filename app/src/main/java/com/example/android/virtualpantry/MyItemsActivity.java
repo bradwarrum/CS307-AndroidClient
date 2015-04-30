@@ -126,7 +126,16 @@ public class MyItemsActivity extends UserActivity {
             Map<String, String> inventoryItem = new HashMap<>(2);
             inventoryItem.put("itemName", item.description);
             String subtitle = "";
-            subtitle += "UPC:" + item.UPC + " - " + item.packaging.packageSize + " " + item.packaging.unitName + " " + item.packaging.packageName;
+            if(item.UPC.length() != 5) {
+                subtitle += "UPC:" + item.UPC + " - ";
+            }
+            subtitle += item.quantity;
+            if(item.fractional != 0){
+                subtitle += "." + item.fractional;
+            }
+            subtitle += " (" + item.packaging.packageSize;
+            subtitle += " " + item.packaging.unitAbbreviation;
+            subtitle += " " + item.packaging.packageName + ")";
             inventoryItem.put("info", subtitle);
             mInventoryData.add(inventoryItem);
         }
@@ -198,6 +207,7 @@ public class MyItemsActivity extends UserActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_my_items, menu);
+        super.onCreateOptionsMenu(menu);
         return true;
     }
 

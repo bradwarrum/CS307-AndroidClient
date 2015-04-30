@@ -149,8 +149,16 @@ public class InventoryActivity extends UserActivity {
             Map<String, String> inventoryItem = new HashMap<>(2);
             inventoryItem.put("itemName", item.description);
             String subtitle = "";
-            subtitle += "UPC:" + item.UPC + " - " + item.quantity;
-            subtitle += " " + item.packaging.packageName;
+            if(item.UPC.length() != 5) {
+                subtitle += "UPC:" + item.UPC + " - ";
+            }
+            subtitle += item.quantity;
+            if(item.fractional != 0){
+                subtitle += "." + item.fractional;
+            }
+            subtitle += " (" + item.packaging.packageSize;
+            subtitle += " " + item.packaging.unitAbbreviation;
+            subtitle += " " + item.packaging.packageName + ")";
             inventoryItem.put("info", subtitle);
             mInventoryData.add(inventoryItem);
         }
@@ -240,8 +248,10 @@ public class InventoryActivity extends UserActivity {
         }
         String quantity, fractional;
         if(totalQuantity.contains(".")){
-            quantity = totalQuantity.split(".")[0];
-            fractional = totalQuantity.split(".")[1];
+            Float temp = new Float(totalQuantity);
+            int intQuantity = (int)temp.floatValue();
+            quantity = "" + intQuantity;
+            fractional = "" + (int)((temp - new Float(quantity))*100);
         } else {
             quantity = totalQuantity;
             fractional = "0";
@@ -300,8 +310,10 @@ public class InventoryActivity extends UserActivity {
         }
         String quantity, fractional;
         if(totalQuantity.contains(".")){
-            quantity = totalQuantity.split(".")[0];
-            fractional = totalQuantity.split(".")[1];
+            Float temp = new Float(totalQuantity);
+            int intQuantity = (int)temp.floatValue();
+            quantity = "" + intQuantity;
+            fractional = "" + (int)((temp - new Float(quantity))*100);
         } else {
             quantity = totalQuantity;
             fractional = "0";
@@ -318,6 +330,7 @@ public class InventoryActivity extends UserActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_inventory, menu);
+        super.onCreateOptionsMenu(menu);
         return true;
     }
 

@@ -119,12 +119,16 @@ public class ShoppingListActivity extends UserActivity {
             Map<String, String> listItem = new HashMap<>(2);
             listItem.put("itemName", item.description);
             String subtitle = "";
-            subtitle += "UPC:" + item.UPC + " - " + item.quantity;
-            /*if(item.fractional != 0){
-                subtitle += "/" + item.fractional;
-            }*/
-            //subtitle += " " + item.unitName;
-            subtitle += " " +  item.packaging.packageName;
+            if(item.UPC.length() != 5) {
+                subtitle += "UPC:" + item.UPC + " - ";
+            }
+            subtitle += item.quantity;
+            if(item.fractional != 0){
+                subtitle += "." + item.fractional;
+            }
+            subtitle += " (" + item.packaging.packageSize;
+            subtitle += " " + item.packaging.unitAbbreviation;
+            subtitle += " " + item.packaging.packageName + ")";
             listItem.put("info", subtitle);
             mListData.add(listItem);
         }
@@ -185,16 +189,18 @@ public class ShoppingListActivity extends UserActivity {
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String quantity, fraction;
+                String quantity, fractional;
                 String value = newQuantity.getText().toString();
                 if(value.contains(".")){
-                    quantity = value.split(".")[0];
-                    fraction = value.split(".")[1];
+                    Float temp = new Float(value);
+                    int intQuantity = (int)temp.floatValue();
+                    quantity = "" + intQuantity;
+                    fractional = "" + (int)((temp - new Float(quantity))*100);
                 } else {
                     quantity = value;
-                    fraction = "0";
+                    fractional = "0";
                 }
-                updateQuantity(position, quantity, fraction);
+                updateQuantity(position, quantity, fractional);
                 dialog.cancel();
             }
         });
