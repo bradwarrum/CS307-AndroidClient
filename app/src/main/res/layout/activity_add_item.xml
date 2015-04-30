@@ -47,33 +47,65 @@
         android:id="@+id/UserItemDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
     <EditText
         android:id="@+id/ItemPackageName"
         android:hint="@string/AddItemPackageNameHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <EditText
-        android:id="@+id/ItemPackageSize"
-        android:inputType="numberDecimal"
-        android:hint="@string/AddItemPackageSizeHint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <EditText
-            android:id="@+id/ItemUnitCount"
-            android:hint="@string/AddItemQuantityHint"
+            android:id="@+id/ItemPackageSize"
             android:inputType="numberDecimal"
-            android:layout_width="250sp"
-            android:layout_height="wrap_content"/>
+            android:hint="@string/AddItemPackageSizeHint"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
         <Spinner
             android:id="@+id/ItemUnitType"
-            android:layout_width="150sp"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/AddItemUnitHint"/>
+            android:hint="@string/AddItemUnitHint"
+            android:layout_weight="2" />
     </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/button_material_light"
+        android:padding="1dp"
+        android:layout_marginLeft="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Packaging Preview"
+            android:id="@+id/textView" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=""
+            android:id="@+id/PackagingPreview"
+            android:layout_gravity="left" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/ItemUnitCount"
+        android:hint="@string/AddItemQuantityHint"
+        android:inputType="numberDecimal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
+
     <Button
         android:id="@+id/PushItemButton"
         android:text="@string/AddItemAddItemButtonText"

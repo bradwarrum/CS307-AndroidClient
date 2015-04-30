@@ -214,8 +214,9 @@ public class InventoryDataSource {
                         Request req = new Request(NetworkUtility.createGetInventoryString(householdID,
                                 context.getSharedPreferences(PreferencesHelper.USER_INFO, Context.MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null)),
                                 Request.GET);
-                        req.setHeader("If-None-Match", "\"" + String.valueOf(version) + "\"");
+
                         if (req.openConnection()) {
+                            req.setHeader("If-None-Match", "\"" + String.valueOf(version) + "\"");
                             req.execute();
                             if (req.getResponseCode() != 304) {
                                 JSONModels.GetInventoryResponse resp = parseWebResponse(req, JSONModels.GetInventoryResponse.class);

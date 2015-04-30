@@ -204,8 +204,9 @@ public class ListDataSource {
 
                     Request req = new Request(NetworkUtility.createGetInventoryString(householdID, context.getSharedPreferences(PreferencesHelper.USER_INFO, Context.MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null))
                     , Request.GET);
-                    req.setHeader("If-None-Match", "\"" + String.valueOf(invVersion) + "\"");
+
                     if (req.openConnection()) {
+                        req.setHeader("If-None-Match", "\"" + String.valueOf(invVersion) + "\"");
                         req.execute();
                         if (req.getResponseCode() != 304) {
                             JSONModels.GetInventoryResponse invresp = parseWebResponse(req, JSONModels.GetInventoryResponse.class);
@@ -337,7 +338,7 @@ public class ListDataSource {
                             + "FROM ShoppingListItems S INNER JOIN InventoryItems I ON (S.UPC=I.UPC AND S.HouseholdID=I.HouseholdID) "
                             + "WHERE S.ListID=?;", new String[]{String.valueOf(listID)});
 
-                    while (c.moveToNext()) {
++                    while (c.moveToNext()) {
                         int unitID = c.getInt(1);
                         UnitTypes t = UnitTypes.fromID(unitID);
                         JSONModels.GetShoppingListResponse.Item.ListItemPackaging packaging = new JSONModels.GetShoppingListResponse.Item.ListItemPackaging(c.getFloat(0), unitID, t.getUnitName(), t.getUnitAbbrev(), c.getString(2));

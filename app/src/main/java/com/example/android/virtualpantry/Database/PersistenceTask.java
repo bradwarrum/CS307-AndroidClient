@@ -2,6 +2,7 @@ package com.example.android.virtualpantry.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
@@ -108,17 +109,55 @@ public abstract class PersistenceTask extends AsyncTask<Void, Void, Void> {
     }
 
     protected final long updateLocalList(SQLiteDatabase database, int householdID, int listID, Context context, long version) {
+        Cursor c = database.query("Households", new String[] {"Version"}, "ID=?", new String[] {String.valueOf(householdID)}, null, null, null);
+        if (!c.moveToFirst()) {
+            c.close();
+            status = PersistenceResponseCode.ERR_DB_DATA_NOT_FOUND;
+            return -1;
+        }
+        long invVersion = c.getLong(0);
+        c.close();
+
+        Request req = new Request(NetworkUtility.createGetInventoryString(householdID, context.getSharedPreferences(PreferencesHelper.USER_INFO, Context.MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null))
+                , Request.GET);
+
+        if (req.openConnection()) {
+            req.setHeader("If-None-Match", "\"" + String.valueOf(invVersion) + "\"");
+            req.execute();
+            if (req.getResponseCode() != 304) {
+                JSONModels.GetInventoryResponse invresp = parseWebResponse(req, JSONModels.GetInventoryResponse.class);
+                if (invresp == null) {
+                    return -1;
+                }
+                if (!updateLocalInventory(database, householdID, invresp)) return -1;
+                ContentValues v = new ContentValues();
+                v.put("Version", invresp.version);
+                if (1 != database.update("Households", v, "ID=?", new String[] {String.valueOf(householdID)})) {
+                    status = PersistenceResponseCode.ERR_DB_INTERNAL;
+                    return -1;
+                }
+            }
+
+        }
+
+
+
         ContentValues setOrphan = new ContentValues();
         setOrphan.put("Orphaned", 1);
         database.update("ShoppingListItems", setOrphan, "ListID = ?", new String[] {String.valueOf(listID)});
 
-        Request req = new Request(NetworkUtility.createGetListString(householdID, listID,
+        req = new Request(NetworkUtility.createGetListString(householdID, listID,
                 context.getSharedPreferences(PreferencesHelper.USER_INFO, Context.MODE_PRIVATE).getString(PreferencesHelper.TOKEN, null)
         ), Request.GET);
-        req.setHeader("If-None-Match", "\"" + String.valueOf(version) + "\"");
         if (req.openConnection()) {
+            req.setHeader("If-None-Match", "\"" + String.valueOf(version) + "\"");
             req.execute();
-            if (req.getResponseCode() == 304) return version;
+            if (req.getResponseCode() == 304) {
+                setOrphan.clear();
+                setOrphan.put("Orphaned", 0);
+                database.update("ShoppingListItems", setOrphan, "ListID=?", new String[] {String.valueOf(listID)});
+                return version;
+            }
             JSONModels.GetShoppingListResponse listresp = parseWebResponse(req, JSONModels.GetShoppingListResponse.class);
             if (listresp == null) return -1;
             ContentValues params = new ContentValues();
@@ -142,6 +181,9 @@ public abstract class PersistenceTask extends AsyncTask<Void, Void, Void> {
             params.put("Version", listresp.version);
             version = listresp.version;
             database.update("ShoppingLists", params, "ListID=?", new String[] {String.valueOf(listID)});
+            /*database.setTransactionSuccessful();
+            database.endTransaction();
+            database.beginTransaction();*/
         } else {
             status = PersistenceResponseCode.ERR_CLIENT_CONNECT;
             return -1;

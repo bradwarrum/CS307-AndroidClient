@@ -3,11 +3,14 @@ package com.example.android.virtualpantry;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,6 +26,7 @@ import com.example.android.virtualpantry.Database.ListDataSource;
 import com.example.android.virtualpantry.Database.PersistenceRequestCode;
 import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
+import com.example.android.virtualpantry.Database.UnitTypes;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -52,6 +56,7 @@ public class AddItemActivity extends UserActivity {
     private EditText mItemUnitCount;
     private Spinner mItemUnitType;
     private Button mAddItemButton;
+    private TextView mPackagePreview;
 
     private EditText mPackageName;
     private EditText mPackageSize;
@@ -77,6 +82,7 @@ public class AddItemActivity extends UserActivity {
         mItemUnitCount = (EditText) findViewById(R.id.ItemUnitCount);
         mItemUnitType = (Spinner) findViewById(R.id.ItemUnitType);
         mAddItemButton = (Button) findViewById(R.id.PushItemButton);
+        mPackagePreview = (TextView) findViewById(R.id.PackagingPreview);
 
         mPackageName = (EditText) findViewById(R.id.ItemPackageName);
         mPackageSize = (EditText) findViewById(R.id.ItemPackageSize);
@@ -128,8 +134,67 @@ public class AddItemActivity extends UserActivity {
                 addItem();
             }
         });
+        mItemUserDescription.addTextChangedListener(twatch);
+        mPackageName.addTextChangedListener(twatch);
+        mPackageSize.addTextChangedListener(twatch);
+        //mItemUnitCount.addTextChangedListener(twatch);
+        mItemUnitType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                updatePackagePreview();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
     }
 
+    private TextWatcher twatch = new TextWatcher() {
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            updatePackagePreview();
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
+
+    private void updatePackagePreview() {
+        String preview = "";
+        String temp;
+        if (!(temp = mPackageSize.getText().toString()).equals("")) {
+            preview = preview + temp + " ";
+        } else {
+            mPackagePreview.setText("");
+            return;
+        }
+        UnitTypes utype = UnitTypes.fromID(mItemUnitType.getSelectedItemPosition() + 1);
+        preview += utype.getUnitAbbrev() + " ";
+        if (!(temp = mPackageName.getText().toString()).equals("")) {
+            preview = preview + temp + " of ";
+        } else {
+            mPackagePreview.setText("");
+            return;
+        }
+        if (!(temp = mItemUserDescription.getText().toString()).equals("")) {
+            preview = preview + temp;
+        } else {
+            mPackagePreview.setText("");
+            return;
+        }
+        mPackagePreview.setText(preview);
+    }
     private void switchBarcodeMode() {
         if (mBarcodeSection.getVisibility() == View.VISIBLE) {
             mBarcodeSection.setVisibility(View.GONE);
