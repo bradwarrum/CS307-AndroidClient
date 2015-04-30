@@ -15,5 +15,6 @@ public enum PersistenceRequestCode {
     DELETE_LIST,
     LINK_UPC,
     FETCH_INVENTORY,
-    UPDATE_INVENTORY
+    UPDATE_INVENTORY,
+    UPDATE_CART
 }

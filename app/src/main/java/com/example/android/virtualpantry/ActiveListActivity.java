@@ -61,7 +61,7 @@ public class ActiveListActivity extends UserActivity {
     private boolean listDone = false;
     private boolean invDone = false;
 
-    private List<JSONModels.GetShoppingListResponse.Item> mItemsInCart;
+    //private List<JSONModels.GetShoppingListResponse.Item> mItemsInCart;
 
     private GetShoppingListResponse mShoppingListJSON;
     private GetShoppingListResponse mCartItems;
@@ -156,6 +156,9 @@ public class ActiveListActivity extends UserActivity {
                         closeOut();
                     }
                     break;
+                case UPDATE_CART:
+                    listDataSource.getListItems(mHouseholdID, mListID, false, this);
+                    break;
                 default:
                     Toast.makeText(this, "Unknown callback" + request + " result in " + status, Toast.LENGTH_LONG).show();
 
@@ -177,7 +180,7 @@ public class ActiveListActivity extends UserActivity {
         mSubtitle.setText(new Long(mShoppingListJSON.version).toString());
         mListData = new ArrayList<Map<String, String>>();
         mCartData = new ArrayList<Map<String, String>>();
-        mItemsInCart = new ArrayList<>();
+        List<GetShoppingListResponse.Item> mItemsInCart = new ArrayList<>();
         for(JSONModels.GetShoppingListResponse.Item item : mShoppingListJSON.items) {
             if(itemsInCart.contains(item.UPC)){
                 mItemsInCart.add(item);
@@ -193,7 +196,7 @@ public class ActiveListActivity extends UserActivity {
             listItem.put("info", subtitle);
             mListData.add(listItem);
         }
-        for(JSONModels.GetShoppingListResponse.Item item : mItemsInCart){
+        for(JSONModels.GetShoppingListResponse.Item item : mCartItems.items){
             Map<String, String> listItem = new HashMap<>(2);
             listItem.put("itemName", item.description);
             String subtitle = "";
@@ -228,7 +231,7 @@ public class ActiveListActivity extends UserActivity {
         mCartList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                takeItemFromCart(mItemsInCart.get(position).UPC);
+                takeItemFromCart(mCartItems.items.get(position).UPC);
                 return true;
             }
         });

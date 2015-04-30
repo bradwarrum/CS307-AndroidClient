@@ -240,6 +240,7 @@ public class ListDataSource {
 
             @Override
             protected void doInBackground() {
+                requestType = PersistenceRequestCode.UPDATE_CART;
                 SQLiteDatabase database = dbHandler.getWritableDatabase();
                 ContentValues params = new ContentValues();
 
