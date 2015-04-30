@@ -162,8 +162,13 @@ public class MyItemsActivity extends UserActivity {
                 String totalQuantity = input.getText().toString();
                 String quantity, fractional;
                 if(totalQuantity.contains(".")){
-                    quantity = totalQuantity.split(".")[0];
-                    fractional = totalQuantity.split(".")[1];
+                    //String[] temp = totalQuantity.split(".");
+                    Float temp = new Float(totalQuantity);
+                    int intQuantity = (int)temp.floatValue();
+                    quantity = "" + intQuantity;
+                    fractional = "" + (int)((temp - new Float(quantity))*100);
+                    //quantity = totalQuantity.split(".")[0];
+                    //fractional = totalQuantity.split(".")[1];
                 } else {
                     quantity = totalQuantity;
                     fractional = "0";
