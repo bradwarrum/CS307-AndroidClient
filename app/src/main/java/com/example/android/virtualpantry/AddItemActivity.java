@@ -53,7 +53,6 @@ public class AddItemActivity extends UserActivity {
     private Button mScanBarcode;
     private TextView mItemDescriptionText;
     private EditText mItemUserDescription;
-    private EditText mItemUnitCount;
     private Spinner mItemUnitType;
     private Button mAddItemButton;
     private TextView mPackagePreview;
@@ -79,7 +78,6 @@ public class AddItemActivity extends UserActivity {
         mScanBarcode = (Button) findViewById(R.id.ScanBarcodeButton);
         mItemDescriptionText = (TextView) findViewById(R.id.ItemDescriptionText);
         mItemUserDescription = (EditText) findViewById(R.id.UserItemDescription);
-        mItemUnitCount = (EditText) findViewById(R.id.ItemUnitCount);
         mItemUnitType = (Spinner) findViewById(R.id.ItemUnitType);
         mAddItemButton = (Button) findViewById(R.id.PushItemButton);
         mPackagePreview = (TextView) findViewById(R.id.PackagingPreview);
@@ -230,24 +228,14 @@ public class AddItemActivity extends UserActivity {
     private void addItem(){
         mBarcode.setError(null);
         mItemUserDescription.setError(null);
-        mItemUnitCount.setError(null);
 
 
         String barcodeText = mBarcode.getText().toString();
         String userDescription = mItemUserDescription.getText().toString();
-        String unitCount = mItemUnitCount.getText().toString();
         int unitType = mItemUnitType.getSelectedItemPosition() + 1;
         String packageName = mPackageName.getText().toString();
         String packageSize = mPackageSize.getText().toString();
 
-        String quantity, fractional;
-        if(unitCount.contains(".")){
-            quantity = unitCount.split(".")[0];
-            fractional = unitCount.split(".")[1];
-        } else {
-            quantity = unitCount;
-            fractional = "0";
-        }
 
         if(mBarcodeSection.getVisibility() == View.GONE){
             barcodeText = null;
@@ -256,11 +244,6 @@ public class AddItemActivity extends UserActivity {
         boolean cancel = false;
         View focusView = null;
 
-        if(TextUtils.isEmpty(unitCount) || !isInt(unitCount)){
-            mItemUnitCount.setError("Must be an integer value");
-            focusView = mItemUnitCount;
-            cancel = true;
-        }
         if(TextUtils.isEmpty(packageSize) | !isFloat(packageSize)){
             mPackageSize.setError("Must be float value");
             focusView = mPackageSize;
@@ -290,8 +273,8 @@ public class AddItemActivity extends UserActivity {
                 cancelToLoginPage();
             }
             Toast.makeText(this, "Adding item", Toast.LENGTH_SHORT).show();
-            UpdateListItem listItem = new UpdateListItem(barcodeText, Integer.valueOf(quantity), Integer.valueOf(fractional));
-            LinkRequest linkRequest = new LinkRequest(userDescription, packageName, unitType, Integer.valueOf(packageSize), mVersion);
+            //UpdateListItem listItem = new UpdateListItem(barcodeText, Integer.valueOf(quantity), Integer.valueOf(fractional));
+            //LinkRequest linkRequest = new LinkRequest(userDescription, packageName, unitType, Integer.valueOf(packageSize), mVersion);
             if(barcodeText == null){
                 invDataSource.generateUPC(mHouseholdID, userDescription, packageName, unitType, Integer.valueOf(packageSize), this);
             } else {
@@ -313,35 +296,7 @@ public class AddItemActivity extends UserActivity {
     public void callback(PersistenceRequestCode request, PersistenceResponseCode status, Object returnValue, Type returnType) {
         super.callback(request, status, returnValue, returnType);
         if(status == PersistenceResponseCode.SUCCESS) {
-            if (request == PersistenceRequestCode.LINK_UPC) {
-                String quantity, fractional;
-                String unitCount = mItemUnitCount.getText().toString();
-                if (unitCount.contains(".")) {
-                    quantity = unitCount.split(".")[0];
-                    fractional = unitCount.split(".")[1];
-                } else {
-                    quantity = unitCount;
-                    fractional = "0";
-                }
-                String UPC = (String) returnValue;
-                if (mMode == LIST_MODE) {
-                    UpdateListItem updateItem = new UpdateListItem(UPC, Integer.valueOf(quantity), Integer.valueOf(fractional));
-                    List<UpdateListItem> updateList = new ArrayList<UpdateListItem>();
-                    updateList.add(updateItem);
-                    listDataSource.updateList(mListID, updateList, this);
-                } else {
-                    JSONModels.UpdateInventoryRequest.UpdateInventoryItem updateItem =
-                            new JSONModels.UpdateInventoryRequest.UpdateInventoryItem(
-                                    UPC,
-                                    Integer.valueOf(quantity),
-                                    Integer.valueOf(fractional));
-                    List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> updateList = new ArrayList<>();
-                    updateList.add(updateItem);
-                    invDataSource.updateInventoryQuantity(mHouseholdID, updateList, this);
-                }
-            } else if (request == PersistenceRequestCode.UPDATE_LIST){
-                itemAdded();
-            }
+            itemAdded();
         } else {
             Toast.makeText(this, "Error in data access of " + request + " result in " + status, Toast.LENGTH_LONG).show();
         }

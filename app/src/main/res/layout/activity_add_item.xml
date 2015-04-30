@@ -80,8 +80,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/button_material_light"
-        android:padding="1dp"
-        android:layout_marginLeft="4dp">
+        android:padding="4dp"
+        android:layout_marginLeft="2dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -98,13 +98,6 @@
             android:id="@+id/PackagingPreview"
             android:layout_gravity="left" />
     </LinearLayout>
-
-    <EditText
-        android:id="@+id/ItemUnitCount"
-        android:hint="@string/AddItemQuantityHint"
-        android:inputType="numberDecimal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
 
     <Button
         android:id="@+id/PushItemButton"
