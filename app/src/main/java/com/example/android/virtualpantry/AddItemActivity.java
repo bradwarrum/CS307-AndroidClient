@@ -93,7 +93,7 @@ public class AddItemActivity extends UserActivity {
             mHouseholdID = myIntent.getIntExtra("householdID", -1);
         } else{
             Log.e(LOG_TAG, "Calling intent did not have a household ID");
-        }
+        }/*
         if(myIntent.hasExtra("listID")){
             mListID = myIntent.getIntExtra("listID", -1);
         } else {
@@ -108,7 +108,7 @@ public class AddItemActivity extends UserActivity {
             mVersion = (int)myIntent.getLongExtra("version", -1);
         } else {
             Log.e(LOG_TAG, "Calling intent did not have a mode");
-        }
+        }*/
 
         //populate spinner
         mItemUnitType.setAdapter(new ArrayAdapter<MeasurementUnit>(this, android.R.layout.simple_spinner_item, MeasurementUnit.values()));

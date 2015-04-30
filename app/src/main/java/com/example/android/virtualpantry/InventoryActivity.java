@@ -165,9 +165,9 @@ public class InventoryActivity extends UserActivity {
         mAddItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(InventoryActivity.this, AddItemActivity.class);
+                Intent intent = new Intent(InventoryActivity.this, MyItemsActivity.class);
                 intent.putExtra("householdID", mHouseholdID);
-                intent.putExtra("mode", AddItemActivity.INVENTORY_MODE);
+                intent.putExtra("mode", MyItemsActivity.INVENTORY_MODE);
                 startActivity(intent);
             }
         });

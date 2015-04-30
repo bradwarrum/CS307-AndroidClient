@@ -139,11 +139,10 @@ public class ShoppingListActivity extends UserActivity {
         mAddItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ShoppingListActivity.this, AddItemActivity.class);
+                Intent intent = new Intent(ShoppingListActivity.this, MyItemsActivity.class);
                 intent.putExtra("householdID", mHouseholdID);
                 intent.putExtra("listID", mListID);
-                intent.putExtra("mode", AddItemActivity.LIST_MODE);
-                intent.putExtra("version", new Long(mShoppingListJSON.version).longValue());
+                intent.putExtra("mode", MyItemsActivity.LIST_MODE);
                 startActivity(intent);
             }
         });

@@ -38,6 +38,13 @@
         android:textSize="20sp"
         android:layout_marginBottom="10sp"/>
     <Button
+        android:id="@+id/LinkItemButton"
+        android:text="Add Item"
+        android:textSize="20sp"
+        android:layout_marginBottom="10sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
         android:id="@+id/ViewInventoryButton"
         android:text="@string/ViewInventoryButtonText"
         android:layout_width="match_parent"

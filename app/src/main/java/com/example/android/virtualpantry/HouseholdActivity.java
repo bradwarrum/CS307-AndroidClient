@@ -44,6 +44,7 @@ public class HouseholdActivity extends UserActivity {
     private TextView mSubtitle;
     private TextView mMembers;
     private Button mCreateListButton;
+    private Button mAddItemButton;
     private ListView mShoppingLists;
     private Household mHousehold = null;
     private int mHouseholdID;
@@ -77,6 +78,7 @@ public class HouseholdActivity extends UserActivity {
         mCreateListButton = (Button) findViewById(R.id.CreateNewShoppingListButton);
         mShoppingLists = (ListView) findViewById(R.id.ListviewHousehold);
         mViewInventoryButton = (Button) findViewById(R.id.ViewInventoryButton);
+        mAddItemButton = (Button) findViewById(R.id.LinkItemButton);
         //event listeners
         mCreateListButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +97,14 @@ public class HouseholdActivity extends UserActivity {
                     Intent intent = new Intent(HouseholdActivity.this, ActiveListActivity.class);
                     startActivity(intent);
                 }
+            }
+        });
+        mAddItemButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HouseholdActivity.this, AddItemActivity.class);
+                intent.putExtra("householdID", mHouseholdID);
+                startActivity(intent);
             }
         });
         //get information
