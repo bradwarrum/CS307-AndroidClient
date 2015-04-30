@@ -233,11 +233,6 @@ public class ShoppingListActivity extends UserActivity {
         List<UpdateListItem> updateList = new ArrayList<>();
         updateList.add(updateItem);
         listDataSource.updateList(mListID, updateList, this);
-        /*new UpdateListQuantityTask(mHouseholdID, mShoppingListJSON.version,
-                mShoppingListJSON.items.get(position).UPC,
-                new Integer(quantity).intValue(),
-                mShoppingListJSON.items.get(position).fractional,
-                token).execute((Void) null);*/
     }
 
 

@@ -14,14 +14,25 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.virtualpantry.Data.JSONModels;
+import com.example.android.virtualpantry.Database.InventoryDataSource;
+import com.example.android.virtualpantry.Database.ListDataSource;
+import com.example.android.virtualpantry.Database.PersistenceRequestCode;
+import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
+import com.example.android.virtualpantry.Database.VirtualPantryContract;
 import com.example.android.virtualpantry.Network.NetworkUtility;
 import com.example.android.virtualpantry.Network.Request;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import com.example.android.virtualpantry.Data.JSONModels.GetShoppingListResponse;
+import com.example.android.virtualpantry.Data.JSONModels.UpdateInventoryRequest.UpdateInventoryItem;
+import com.example.android.virtualpantry.Data.JSONModels.UpdateListRequest.UpdateListItem;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class ActiveListActivity extends ActionBarActivity {
+public class ActiveListActivity extends UserActivity {
 
     private static final String LOG_TAG = "ActiveListActivity";
     private TextView mHeader;
@@ -43,17 +54,25 @@ public class ActiveListActivity extends ActionBarActivity {
     private ListView mCartList;
     private TextView mCartModeText;
 
-    private long mHouseholdID;
-    private long mListID;
+    private int mHouseholdID;
+    private int mListID;
+
+    private boolean wrapUp = false;
+    private boolean listDone = false;
+    private boolean invDone = false;
 
     private List<JSONModels.GetShoppingListResponse.Item> mItemsInCart;
 
-    private JSONModels.GetShoppingListResponse mShoppingListJSON;
+    private GetShoppingListResponse mShoppingListJSON;
+    private GetShoppingListResponse mCartItems;
     private List<Map<String, String>> mListData;
     private SimpleAdapter mListDataAdapter;
 
     private List<Map<String, String>> mCartData;
     private SimpleAdapter mCartDataAdapter;
+
+    private ListDataSource listDataSource;
+    private InventoryDataSource inventoryDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,31 +109,70 @@ public class ActiveListActivity extends ActionBarActivity {
                 }
             }
         });
-        mHouseholdID = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getLong(PreferencesHelper.SHOPPING_CART_HOUSEHOLD_ID, -1);
-        mListID = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getLong(PreferencesHelper.SHOPPING_CART_LIST_ID, -1);
+        mHouseholdID = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getInt(PreferencesHelper.SHOPPING_CART_HOUSEHOLD_ID, -1);
+        mListID = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getInt(PreferencesHelper.SHOPPING_CART_LIST_ID, -1);
         final String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            cancelToLoginPage();
         }
-        new GetListTask(mHouseholdID, mListID, token).execute((Void) null);
+        //new GetListTask(mHouseholdID, mListID, token).execute((Void) null);
         mCheckoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new GetInventoryTask(mHouseholdID, token).execute((Void) null);
+                saveToInventory();
             }
         });
+        listDataSource = new ListDataSource(this);
+        inventoryDataSource = new InventoryDataSource(this);
+        //listDataSource.getListItems(mHouseholdID, mListID, true, this);
+        listDataSource.getCartItems(mListID, this);
+        inventoryDataSource.getInventory(mHouseholdID, true, this);
     }
 
-    private void updateDisplay(String response){
-        String itemsInCartStr = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE)
-                .getString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, null);
-        itemsInCartStr = itemsInCartStr.trim();
-        Set<String> itemsInCart = new HashSet<String>(Arrays.asList(itemsInCartStr.split(",")));
-        mShoppingListJSON = JSONModels.gson.fromJson(response, JSONModels.GetShoppingListResponse.class);
+    @Override
+    public void callback(PersistenceRequestCode request, PersistenceResponseCode status, Object returnValue, Type returnType) {
+        super.callback(request, status, returnValue, returnType);
+        if(status == PersistenceResponseCode.SUCCESS){
+            switch(request){
+                case FETCH_INVENTORY:
+                    break;
+                case FETCH_LIST:
+                    updateDisplay((GetShoppingListResponse) returnValue);
+                    break;
+                case FETCH_CART:
+                    mCartItems = (GetShoppingListResponse) returnValue;
+                    listDataSource.getListItems(mHouseholdID, mListID, true, this);
+                    break;
+                case UPDATE_INVENTORY:
+                    invDone = true;
+                    if(wrapUp && listDone){
+                        closeOut();
+                    }
+                    break;
+                case UPDATE_LIST:
+                    listDone = true;
+                    if(wrapUp && invDone){
+                        closeOut();
+                    }
+                    break;
+                default:
+                    Toast.makeText(this, "Unknown callback" + request + " result in " + status, Toast.LENGTH_LONG).show();
+
+            }
+        }
+    }
+
+    private void closeOut() {
+        finish();
+    }
+
+    private void updateDisplay(GetShoppingListResponse response){
+        Set<String> itemsInCart = new HashSet<>();
+        for(GetShoppingListResponse.Item item : mCartItems.items){
+            itemsInCart.add(item.UPC);
+        }
+        mShoppingListJSON = response;
         mHeader.setText(mShoppingListJSON.name);
         mSubtitle.setText(new Long(mShoppingListJSON.version).toString());
         mListData = new ArrayList<Map<String, String>>();
@@ -131,10 +189,6 @@ public class ActiveListActivity extends ActionBarActivity {
             listItem.put("itemName", item.description);
             String subtitle = "";
             subtitle += "UPC:" + item.UPC + " - " + item.quantity;
-            /*if(item.fractional != 0){
-                subtitle += "/" + item.fractional;
-            }*/
-            //subtitle += " " + item.unitName;
             subtitle += " " +  item.packaging.packageName;
             listItem.put("info", subtitle);
             mListData.add(listItem);
@@ -144,10 +198,6 @@ public class ActiveListActivity extends ActionBarActivity {
             listItem.put("itemName", item.description);
             String subtitle = "";
             subtitle += "UPC:" + item.UPC + " - " + item.quantity;
-            /*if(item.fractional != 0){
-                subtitle += "/" + item.fractional;
-            }*/
-            //subtitle += " " + item.unitName;
             subtitle += " " +  item.packaging.packageName;
             listItem.put("info", subtitle);
             mCartData.add(listItem);
@@ -191,7 +241,18 @@ public class ActiveListActivity extends ActionBarActivity {
     }
 
     private void putItemInCart(String UPC){
-        String itemsInCartStr = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE)
+        int position = -1;
+        //for(GetShoppingListResponse.Item item : mCartItems){
+        for(int i = 0; i < mShoppingListJSON.items.size(); i++){
+            GetShoppingListResponse.Item item = mShoppingListJSON.items.get(i);
+            if(item.UPC.equals(UPC)){
+                position = i;
+                break;
+            }
+        }
+        GetShoppingListResponse.Item item = mShoppingListJSON.items.get(position);
+        listDataSource.updateCart(mHouseholdID, mListID, item.UPC, item.quantity, item.fractional, this);
+        /*String itemsInCartStr = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE)
                 .getString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, null);
         itemsInCartStr = itemsInCartStr.trim();
         String[] itemsInCart = itemsInCartStr.split(",");
@@ -207,40 +268,32 @@ public class ActiveListActivity extends ActionBarActivity {
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            cancelToLoginPage();
         }
-        new GetListTask(mHouseholdID, mListID, token).execute((Void) null);
+        new GetListTask(mHouseholdID, mListID, token).execute((Void) null);*/
     }
 
     private void takeItemFromCart(String UPC){
-        String itemsInCartStr = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE)
-                .getString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, null);
-        itemsInCartStr = itemsInCartStr.trim();
-        String[] itemsInCart = itemsInCartStr.split(",");
-        ArrayList<String> newCart = new ArrayList<String>(Arrays.asList(itemsInCart));
-        newCart.remove(UPC);
-        String outStr = "";
-        for(String item : newCart){
-            outStr += item + ",";
+        int position = -1;
+        //for(GetShoppingListResponse.Item item : mCartItems){
+        for(int i = 0; i < mCartItems.items.size(); i++){
+            GetShoppingListResponse.Item item = mCartItems.items.get(i);
+            if(item.UPC.equals(UPC)){
+                position = i;
+                break;
+            }
         }
-        SharedPreferences.Editor editor = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).edit();
-        editor.putString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, outStr);
-        editor.commit();
-        String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
+        GetShoppingListResponse.Item item = mCartItems.items.get(position);
+        listDataSource.updateCart(mHouseholdID, mListID, item.UPC, 0, 0, this);
+        /*String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        }
-        new GetListTask(mHouseholdID, mListID, token).execute((Void) null);
+            cancelToLoginPage();
+        }*/
+        //new GetListTask(mHouseholdID, mListID, token).execute((Void) null);
     }
 
-    private void takeItemFromCartNoUIUpdate(String UPC){
+    /*private void takeItemFromCartNoUIUpdate(String UPC){
         String itemsInCartStr = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE)
                 .getString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, null);
         itemsInCartStr = itemsInCartStr.trim();
@@ -254,10 +307,23 @@ public class ActiveListActivity extends ActionBarActivity {
         SharedPreferences.Editor editor = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).edit();
         editor.putString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, outStr);
         editor.commit();
-    }
+    }*/
 
     //todo:
-    private void saveToInventory(String response){
+    private void saveToInventory(){
+        wrapUp = true;
+        List<UpdateInventoryItem> inventoryItems = new ArrayList<>();
+        List<UpdateListItem> listItems = new ArrayList<>();
+        for(GetShoppingListResponse.Item item : mCartItems.items){
+            inventoryItems.add(new UpdateInventoryItem(item.UPC, item.quantity, item.fractional));
+            listItems.add(new UpdateListItem(item.UPC, 0, 0));
+        }
+        inventoryDataSource.updateInventoryQuantity(mHouseholdID, inventoryItems, this);
+        listDataSource.updateList(mListID, listItems, this);
+        SharedPreferences.Editor editor = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).edit();
+        editor.putInt(PreferencesHelper.SHOPPING_CART_LIST_ID, -1);
+        editor.commit();
+        /*
         JSONModels.GetInventoryResponse inventory = JSONModels.gson.fromJson(response, JSONModels.GetInventoryResponse.class);
         List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> inventoryItems = new ArrayList<>();
         List<JSONModels.UpdateInventoryRequest.UpdateInventoryItem> listItems = new ArrayList<>();
@@ -288,7 +354,7 @@ public class ActiveListActivity extends ActionBarActivity {
         new UpdateInventoryQuantityTask(mHouseholdID, update, token).execute((Void) null);
         //fix the list now
         JSONModels.UpdateInventoryRequest updateJSON = new JSONModels.UpdateInventoryRequest(mShoppingListJSON.version, listItems);
-        new UpdateListQuantityTask(mHouseholdID, updateJSON, token).execute((Void) null);
+        new UpdateListQuantityTask(mHouseholdID, updateJSON, token).execute((Void) null);*/
     }
 
 
@@ -330,6 +396,7 @@ public class ActiveListActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
     private class GetListTask extends AsyncTask<Void, Void, Integer> {
 
         private static final String LOG_TAG = "GetListTask";
@@ -580,5 +647,5 @@ public class ActiveListActivity extends ActionBarActivity {
                     break;
             }
         }
-    }
+    }*/
 }

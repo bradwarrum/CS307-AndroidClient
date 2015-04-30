@@ -89,13 +89,15 @@ public class HouseholdActivity extends UserActivity {
         ((Button) findViewById(R.id.GoToShoppingCartButton)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Set<Long> listIDs = new HashSet<Long>();
-                for(Household.HouseholdList list : mHousehold.lists){
-                    listIDs.add(list.listID);
+                Set<Integer> listIDs = new HashSet<Integer>();
+                for (Household.HouseholdList list : mHousehold.lists) {
+                    listIDs.add((int)list.listID);
                 }
-                if(listIDs.contains(getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getLong(PreferencesHelper.SHOPPING_CART_LIST_ID, -1))){
-                    Intent intent = new Intent(HouseholdActivity.this, ActiveListActivity.class);
-                    startActivity(intent);
+                if (listIDs.contains(getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getInt(PreferencesHelper.SHOPPING_CART_LIST_ID, -1))) {
+                    if (getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getInt(PreferencesHelper.SHOPPING_CART_LIST_ID, -1) != -1) {
+                        Intent intent = new Intent(HouseholdActivity.this, ActiveListActivity.class);
+                        startActivity(intent);
+                    }
                 }
             }
         });
@@ -181,8 +183,8 @@ public class HouseholdActivity extends UserActivity {
             public void onClick(DialogInterface dialog, int which) {
                 SharedPreferences.Editor editor = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).edit();
                 editor.putString(PreferencesHelper.SHOPPING_CART_ITEMS_IN_CART, " ");
-                editor.putLong(PreferencesHelper.SHOPPING_CART_HOUSEHOLD_ID, mHouseholdID);
-                editor.putLong(PreferencesHelper.SHOPPING_CART_LIST_ID, mHousehold.lists.get(position).listID);
+                editor.putInt(PreferencesHelper.SHOPPING_CART_HOUSEHOLD_ID, mHouseholdID);
+                editor.putInt(PreferencesHelper.SHOPPING_CART_LIST_ID, (int)mHousehold.lists.get(position).listID);
                 editor.commit();
                 Intent intent = new Intent(HouseholdActivity.this, ActiveListActivity.class);
                 startActivity(intent);

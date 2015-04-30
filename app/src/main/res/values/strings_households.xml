@@ -17,5 +17,5 @@
     <string name="HouseholdDescriptionFiller">Household description</string>
     <string name="CreateNewListButtonText">Create new shopping list</string>
     <string name="ViewInventoryButtonText">View Household Inventory</string>
-    <string name="GoToShoppingCartButtonText">Got to shopping cart</string>
+    <string name="GoToShoppingCartButtonText">Go to shopping cart</string>
 </resources>
