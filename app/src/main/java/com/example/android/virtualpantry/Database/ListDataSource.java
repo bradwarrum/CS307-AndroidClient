@@ -338,7 +338,7 @@ public class ListDataSource {
                             + "FROM ShoppingListItems S INNER JOIN InventoryItems I ON (S.UPC=I.UPC AND S.HouseholdID=I.HouseholdID) "
                             + "WHERE S.ListID=?;", new String[]{String.valueOf(listID)});
 
-+                    while (c.moveToNext()) {
+                    while (c.moveToNext()) {
                         int unitID = c.getInt(1);
                         UnitTypes t = UnitTypes.fromID(unitID);
                         JSONModels.GetShoppingListResponse.Item.ListItemPackaging packaging = new JSONModels.GetShoppingListResponse.Item.ListItemPackaging(c.getFloat(0), unitID, t.getUnitName(), t.getUnitAbbrev(), c.getString(2));
