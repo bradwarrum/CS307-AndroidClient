@@ -267,8 +267,22 @@ public class HouseholdActivity extends UserActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id){
+            case R.id.goto_shopping_cart_action:
+                Set<Integer> listIDs = new HashSet<Integer>();
+                for (Household.HouseholdList list : mHousehold.lists) {
+                    listIDs.add((int)list.listID);
+                }
+                if (listIDs.contains(getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getInt(PreferencesHelper.SHOPPING_CART_LIST_ID, -1))) {
+                    if (getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getInt(PreferencesHelper.SHOPPING_CART_LIST_ID, -1) != -1) {
+                        Intent intent = new Intent(HouseholdActivity.this, ActiveListActivity.class);
+                        startActivity(intent);
+                    }
+                }
+                break;
+            case R.id.add_list_action:
+                createNewListDialog();
+                break;
         }
 
         return super.onOptionsItemSelected(item);

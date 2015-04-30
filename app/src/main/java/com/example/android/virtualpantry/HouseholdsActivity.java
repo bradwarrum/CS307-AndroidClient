@@ -2,10 +2,7 @@ package com.example.android.virtualpantry;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,8 +20,6 @@ import com.example.android.virtualpantry.Database.PersistenceRequestCode;
 import com.example.android.virtualpantry.Database.PersistenceResponseCode;
 import com.example.android.virtualpantry.Database.PreferencesHelper;
 import com.example.android.virtualpantry.Database.VPDatabaseHandler;
-import com.example.android.virtualpantry.Network.NetworkUtility;
-import com.example.android.virtualpantry.Network.Request;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -109,8 +104,14 @@ public class HouseholdsActivity extends UserActivity implements PersistenceCallb
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id){
+            case R.id.add_household_action:
+                Intent intent = new Intent(HouseholdsActivity.this, CreateHouseholdActivity.class);
+                startActivity(intent);
+            break;
+            case R.id.action_settings:
+            break;
+
         }
 
         return super.onOptionsItemSelected(item);

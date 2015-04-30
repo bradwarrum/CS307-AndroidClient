@@ -92,10 +92,7 @@ public class InventoryActivity extends UserActivity {
         String token = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE)
                 .getString(PreferencesHelper.TOKEN, null);
         if(token == null){
-            Intent intent = new Intent(this, LoginRegisterActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            cancelToLoginPage();
         }
 
         householdDataSource = new HouseholdDataSource(this);
@@ -342,8 +339,13 @@ public class InventoryActivity extends UserActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id){
+            case R.id.add_item_inv_action:
+                Intent intent = new Intent(InventoryActivity.this, MyItemsActivity.class);
+                intent.putExtra("householdID", mHouseholdID);
+                intent.putExtra("mode", MyItemsActivity.INVENTORY_MODE);
+                startActivity(intent);
+                break;
         }
 
         return super.onOptionsItemSelected(item);

@@ -2,6 +2,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.android.virtualpantry.HouseholdActivity">
+    <item
+        android:id="@+id/add_list_action"
+        android:icon="@drawable/ic_action_copy"
+        android:title="Create New Household"
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/goto_shopping_cart_action"
+        android:icon="@drawable/shopping_cart"
+        android:title="Go To Shopping Cart"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_logout"
+        android:title="Logout"
+        app:showAsAction="never" />
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

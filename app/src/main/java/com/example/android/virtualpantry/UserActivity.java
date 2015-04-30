@@ -2,13 +2,17 @@ package com.example.android.virtualpantry;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.android.virtualpantry.Database.PersistenceCallback;
 import com.example.android.virtualpantry.Database.PersistenceRequestCode;
 import com.example.android.virtualpantry.Database.PersistenceResponseCode;
+import com.example.android.virtualpantry.Database.PreferencesHelper;
+import com.example.android.virtualpantry.Database.VPDatabaseHandler;
 
 import java.lang.reflect.Type;
 
@@ -56,6 +60,35 @@ public class UserActivity extends ActionBarActivity implements PersistenceCallba
             actionBar.setDisplayShowHomeEnabled(false); // remove the icon
         }
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        switch(id){
+            case R.id.action_logout:
+                VPDatabaseHandler.purgeInfo(this);
+                SharedPreferences user_info = getSharedPreferences(PreferencesHelper.USER_INFO, MODE_PRIVATE);
+                SharedPreferences.Editor editor = user_info.edit();
+                editor.putString(PreferencesHelper.USERNAME, PreferencesHelper.NULL_PREFERENCE_VALUE);
+                editor.putString(PreferencesHelper.PASSWORD, PreferencesHelper.NULL_PREFERENCE_VALUE);
+                editor.putString(PreferencesHelper.TOKEN, PreferencesHelper.TOKEN);
+                editor.commit();
+                Intent intent = new Intent(this, LoginRegisterActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+            case R.id.action_settings:
+                break;
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 }

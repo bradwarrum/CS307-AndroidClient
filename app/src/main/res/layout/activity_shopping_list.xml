@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:text="@string/AddItemButtonText"
         android:id="@+id/AddItemButton"
-
+        android:visibility="gone"
         />
     <ListView
         android:id="@+id/ShoppingItemList"

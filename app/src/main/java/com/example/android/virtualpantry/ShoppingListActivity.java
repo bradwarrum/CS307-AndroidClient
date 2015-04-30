@@ -263,8 +263,14 @@ public class ShoppingListActivity extends UserActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id){
+            case R.id.add_item_list_action:
+                Intent intent = new Intent(ShoppingListActivity.this, MyItemsActivity.class);
+                intent.putExtra("householdID", mHouseholdID);
+                intent.putExtra("listID", mListID);
+                intent.putExtra("mode", MyItemsActivity.LIST_MODE);
+                startActivity(intent);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
