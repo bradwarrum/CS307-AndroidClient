@@ -269,6 +269,9 @@ public class ActiveListActivity extends UserActivity {
                 break;
             }
         }
+        if(position < 0 | position >= mShoppingListJSON.items.size()){
+            return;
+        }
         GetShoppingListResponse.Item item = mShoppingListJSON.items.get(position);
         listDataSource.updateCart(mHouseholdID, mListID, item.UPC, item.quantity, item.fractional, this);
         /*String itemsInCartStr = getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE)
@@ -301,6 +304,9 @@ public class ActiveListActivity extends UserActivity {
                 position = i;
                 break;
             }
+        }
+        if(position < 0 | position >= mCartItems.items.size()){
+            return;
         }
         GetShoppingListResponse.Item item = mCartItems.items.get(position);
         listDataSource.updateCart(mHouseholdID, mListID, item.UPC, 0, 0, this);
@@ -416,6 +422,26 @@ public class ActiveListActivity extends UserActivity {
         switch(id){
             case R.id.active_list_scan_action:
                 scanBarcode();
+                break;
+            case R.id.switch_modes_action:
+                if(mCartList.getVisibility() == View.GONE){
+                    //switch to cart mode
+                    mCartList.setVisibility(View.VISIBLE);
+                    mActiveList.setVisibility(View.GONE);
+                    mSwitchModesButton.setText(getString(R.string.ShoppingCartModeSwitchButton_ToList));
+                    mCartModeText.setText(getString(R.string.ShoppingCartMode_Cart));
+                    item.setIcon(R.drawable.ic_action_paste);
+                } else {
+                    //switch to list mode
+                    mCartList.setVisibility(View.GONE);
+                    mActiveList.setVisibility(View.VISIBLE);
+                    mSwitchModesButton.setText(getString(R.string.ShoppingCartModeSwitchButton_ToCart));
+                    mCartModeText.setText(getString(R.string.ShoppingCartMode_List));
+                    item.setIcon(R.drawable.shopping_cart);
+                }
+                break;
+            case R.id.checkout_action:
+                saveToInventory();
                 break;
         }
 

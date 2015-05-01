@@ -3,6 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.android.virtualpantry.ActiveListActivity">
     <item
+        android:id="@+id/switch_modes_action"
+        android:title="Switch Mode"
+        app:showAsAction="always"
+        android:icon="@drawable/shopping_cart" />
+    <item
+        android:id="@+id/checkout_action"
+        android:title="Checkout"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_done" />
+    <item
         android:id="@+id/active_list_scan_action"
         android:title="Scan Barcode"
         app:showAsAction="always"

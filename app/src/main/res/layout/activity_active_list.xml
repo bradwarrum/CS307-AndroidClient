@@ -38,12 +38,14 @@
         android:id="@+id/CheckoutButton"
         android:layout_marginBottom="10sp"
         android:textSize="20sp"
+        android:visibility="gone"
         />
     <Button
         android:id="@+id/ActiveListBarcodeButton"
         android:text="@string/ScanBarcodeButtonText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:textSize="20sp"/>
     <ListView
         android:id="@+id/ActiveItemList"

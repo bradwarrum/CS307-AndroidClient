@@ -24,12 +24,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5sp"/>
     <TextView
-        android:id="@+id/HouseholdMembers"
+        android:text="Ohter members: John Smith, Mark Gray"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:visibility="gone"
-        />
+        android:layout_height="wrap_content" />
     <Button
         android:id="@+id/GoToShoppingCartButton"
         android:text="@string/GoToShoppingCartButtonText"
@@ -44,14 +41,16 @@
         android:textSize="20sp"
         android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
     <Button
         android:id="@+id/ViewInventoryButton"
         android:text="@string/ViewInventoryButtonText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_marginBottom="10sp"/>
+        android:layout_marginBottom="10sp"
+        android:visibility="gone"/>
     <Button
         android:id="@+id/CreateNewShoppingListButton"
         android:text="@string/CreateNewListButtonText"

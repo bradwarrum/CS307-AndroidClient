@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -74,7 +75,6 @@ public class HouseholdActivity extends UserActivity {
         //grab handles
         mHeader = (TextView) findViewById(R.id.HouseholdHeader);
         mSubtitle = (TextView) findViewById(R.id.HouseholdSubtitle);
-        mMembers = (TextView) findViewById(R.id.HouseholdMembers);
         mCreateListButton = (Button) findViewById(R.id.CreateNewShoppingListButton);
         mShoppingLists = (ListView) findViewById(R.id.ListviewHousehold);
         mViewInventoryButton = (Button) findViewById(R.id.ViewInventoryButton);
@@ -172,6 +172,34 @@ public class HouseholdActivity extends UserActivity {
         builder.show();
     }
 
+    private void addUserToHousehold(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add User to Household");
+        TextView msg = new TextView(this);
+        msg.setText("User ID of user to be added:");
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(msg);
+        layout.addView(input);
+        builder.setView(layout);
+        builder.setPositiveButton("Send Reqeuest", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+
     private void confirmNewActiveList(final int position){
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setTitle("Make new active shopping list");
@@ -265,7 +293,7 @@ public class HouseholdActivity extends UserActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        Intent intent;
         //noinspection SimplifiableIfStatement
         switch(id){
             case R.id.goto_shopping_cart_action:
@@ -275,13 +303,27 @@ public class HouseholdActivity extends UserActivity {
                 }
                 if (listIDs.contains(getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getInt(PreferencesHelper.SHOPPING_CART_LIST_ID, -1))) {
                     if (getSharedPreferences(PreferencesHelper.SHOPPING_CART, MODE_PRIVATE).getInt(PreferencesHelper.SHOPPING_CART_LIST_ID, -1) != -1) {
-                        Intent intent = new Intent(HouseholdActivity.this, ActiveListActivity.class);
+                        intent = new Intent(HouseholdActivity.this, ActiveListActivity.class);
                         startActivity(intent);
                     }
                 }
                 break;
             case R.id.add_list_action:
                 createNewListDialog();
+                break;
+            case R.id.add_user_action:
+                addUserToHousehold();
+                break;
+            case R.id.add_item_action:
+                intent = new Intent(HouseholdActivity.this, AddItemActivity.class);
+                intent.putExtra("householdID", mHouseholdID);
+                startActivity(intent);
+                break;
+            case R.id.inventory_action:
+                intent = new Intent(HouseholdActivity.this, InventoryActivity.class);
+                intent.putExtra("householdID", mHouseholdID);
+                intent.putExtra("householdName", mHousehold.householdName);
+                startActivity(intent);
                 break;
         }
 
